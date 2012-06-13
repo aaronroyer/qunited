@@ -4,12 +4,12 @@ require "qunited/version"
 
 Gem::Specification.new do |s|
   s.name        = "qunited"
-  s.version     = Qunited::VERSION
+  s.version     = QUnited::VERSION
   s.authors     = ["Aaron Royer"]
   s.email       = ["aaronroyer@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{QUnit tests in your build}
+  s.description = %q{QUnited runs headless QUnit tests as part of your normal build}
 
   s.rubyforge_project = "qunited"
 

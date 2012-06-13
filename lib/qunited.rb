@@ -1,5 +1,3 @@
-require "qunited/version"
-
-module Qunited
-  # Your code goes here...
-end
+require 'qunited/version'
+require 'qunited/runner'
+require 'qunited/results'
