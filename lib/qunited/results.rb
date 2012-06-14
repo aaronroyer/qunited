@@ -1,31 +1,4 @@
 module QUnited
-=begin
-
-Run options: --seed 37076
-
-# Running tests:
-
-...FF.
-
-Finished tests in 7.689742s, 0.3901 tests/s, 1.3004 assertions/s.
-
-  1) Failure:
-test_failures_are_recorded_correctly(TestRhinoRunner) [/Users/aaron/Dropbox/home/projects/pro/qunited/test/unit/test_rhino_runner.rb:34]:
-Correct number of failures given.
-Expected: 2
-  Actual: 4
-
-  2) Failure:
-test_other(TestRhinoRunner) [/Users/aaron/Dropbox/home/projects/pro/qunited/test/unit/test_rhino_runner.rb:38]:
-Failed assertion, no message given.
-
-3 tests, 10 assertions, 2 failures, 0 errors, 0 skips
-rake aborted!
-Command failed with status (1): [/Users/aaron/.rbenv/versions/1.9.3-p0/bin/...]
-
-Tasks: TOP => default => test
-(See full trace by running task with --trace)
-=end
 
   # Simple tests results compiler. Takes a raw results hash that was produced by a runner.
   class Results
@@ -33,6 +6,34 @@ Tasks: TOP => default => test
       @data = modules_results_array
       @data.freeze
     end
+
+    # Results output methods
+
+    def dots
+      tests.map { |test| test[:failed] > 0 ? 'F' : '.' }.join
+    end
+
+    def bottom_line
+      "#{total_tests} tests, #{total_assertions} assertions, #{total_failures} failures, 0 errors, 0 skips"
+    end
+
+    def failures_output_array
+      failures_output = []
+      failures.each_with_index do |failure, i|
+        out =  "  #{i+1}) Failure:\n"
+        out << "#{failure[:test_name]} (#{failure[:module_name]}) [#{failure[:file]}]\n"
+        out << "#{failure[:message] || 'Failed assertion, no message given.'}"
+        if failure[:expected]
+          out << "\nExpected: #{failure[:expected]}\n"
+          out <<   "  Actual: #{failure[:actual]}\n"
+        end
+
+        failures_output << out
+      end
+      failures_output
+    end
+
+    # Other data compilation methods
 
     def total_tests
       tests.size
@@ -57,7 +58,29 @@ Tasks: TOP => default => test
     end
 
     def tests
-      @tests ||= modules.inject([]) { |tests, mod| tests += mod[:tests] }
+      @tests ||= modules.inject([]) do |tests, mod|
+        tests += mod[:tests].map do |test_data|
+          # Add module name for convenience in writing results
+          test_data[:module_name] = mod[:name]
+          test_data
+        end
+      end
+    end
+
+    def assertions
+      @assertions ||= tests.inject([]) do |asserts, test|
+        asserts += test[:assertion_data].map do |assertion_data|
+          # Add test, module, and file name for convenience in writing results
+          assertion_data[:test_name] = test[:name]
+          assertion_data[:module_name] = test[:module_name]
+          assertion_data[:file] = test[:file]
+          assertion_data
+        end
+      end
+    end
+
+    def failures
+      @failures ||= assertions.select { |assert| !assert[:result] }
     end
   end
 end

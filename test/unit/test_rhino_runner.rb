@@ -27,7 +27,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
     results = runner.run.results
     assert_equal 4, results.total_tests, 'Correct number of tests run'
     # QUnit calls the log callback (the same it calls for assertions) every time there
-    # is a failed expect(num). So add one.
+    # is a failed expect(num). So add one to this total.
     assert_equal 5 + 1, results.total_assertions, 'Correct number of assertions executed'
     assert_equal 4, results.total_failures, 'Correct number of failures given'
   end
