@@ -6,6 +6,7 @@ module QUnited
   module Runner
     class Rhino < Base
       def can_run?
+        # TODO: test that you have Java
       end
 
       def run
@@ -41,6 +42,7 @@ module QUnited
       def clean_up_test_results(test_results)
         test_results[:start] = DateTime.parse(test_results[:start])
         test_results[:duration] = Float(test_results[:duration])
+        test_results[:failures].map! { |failure| symbolize_keys failure }
         test_results
       end
 
