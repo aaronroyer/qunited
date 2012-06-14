@@ -23,7 +23,6 @@ class TestResults < MiniTest::Unit::TestCase
     results = QUnited::Results.new test_failed_module_results
 
     assert_equal "4 tests, 6 assertions, 4 failures, 0 errors, 0 skips", results.bottom_line
-
     assert_equal "F.FF", results.dots
 
     failure = results.failures_output_array[0].split("\n")
@@ -44,15 +43,28 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal 5, failure.size
     assert_equal '  3) Failure:', failure[0]
     assert_equal 'Addition is hard (Math) [test/javascripts/test_math.js]', failure[1]
-    assert_equal 'I got my math right, again', failure[2]
-    assert_equal 'Expected: 5', failure[3]
-    assert_equal '  Actual: 4', failure[4]
+    assert_equal 'These strings match', failure[2]
+    assert_equal 'Expected: "String here"', failure[3]
+    assert_equal '  Actual: "Identical string here"', failure[4]
 
     failure = results.failures_output_array[3].split("\n")
     assert_equal 3, failure.size
     assert_equal '  4) Failure:', failure[0]
     assert_equal 'Check some subtraction (Math) [test/javascripts/test_math.js]', failure[1]
     assert_equal 'Expected 2 assertions, but 1 were run', failure[2]
+  end
+
+  # Test results are converted to JavaScript appropriate null, not nil
+  def test_null_failures
+    results = QUnited::Results.new test_failed_module_results_with_null
+
+    failure = results.failures_output_array[0].split("\n")
+    assert_equal 5, failure.size
+    assert_equal '  1) Failure:', failure[0]
+    assert_equal 'The test (The module) [test/javascripts/test_module.js]', failure[1]
+    assert_equal 'Was it null?', failure[2]
+    assert_equal 'Expected: 5', failure[3]
+    assert_equal '  Actual: null', failure[4]
   end
 
   private
@@ -181,9 +193,9 @@ class TestResults < MiniTest::Unit::TestCase
               },
               {
                 :result => false,
-                :message => "I got my math right, again",
-                :actual => 4,
-                :expected => 5
+                :message => "These strings match",
+                :actual => "Identical string here",
+                :expected => "String here"
               }
             ],
             :start => DateTime.parse('2012-06-14T13:24:11+00:00'),
@@ -213,6 +225,33 @@ class TestResults < MiniTest::Unit::TestCase
             :duration => 0.008,
             :failed => 1,
             :total => 2
+          }
+        ]
+      }
+    ]
+  end
+
+  def test_failed_module_results_with_null
+    [
+      {
+        :name => "The module",
+        :tests =>  [
+          {
+            :name => "The test",
+            :assertion_data => [
+              {
+                :result => false,
+                :message => "Was it null?",
+                :actual => nil,
+                :expected => 5
+              }
+            ],
+            :start => DateTime.parse('2012-06-14T13:24:11+00:00'),
+            :assertions => 1,
+            :file => "test/javascripts/test_module.js",
+            :duration => 0.002,
+            :failed => 1,
+            :total => 1
           }
         ]
       }

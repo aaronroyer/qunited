@@ -31,4 +31,5 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
     assert_equal 5 + 1, results.total_assertions, 'Correct number of assertions executed'
     assert_equal 4, results.total_failures, 'Correct number of failures given'
   end
+
 end
