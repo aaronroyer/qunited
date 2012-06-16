@@ -1,5 +1,6 @@
 
-var APP = {};
+var APP = {
+// Syntax error
 
 APP.one = function() {
 	return 1;

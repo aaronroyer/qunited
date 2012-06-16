@@ -1,8 +1,7 @@
 module("Basics");
 
 test("This has one failure", function() {
-	expect(1);
-	ok(false); // No message
+	bogusFunction(); // undefined error
 });
 
 test("This has no failures", function() {

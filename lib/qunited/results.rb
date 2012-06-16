@@ -16,6 +16,14 @@ module QUnited
       all_output
     end
 
+    def passed?
+      total_failures.zero?
+    end
+
+    def failed?
+      !passed?
+    end
+
     def dots
       tests.map { |test| test[:failed] > 0 ? 'F' : '.' }.join
     end
@@ -99,6 +107,10 @@ module QUnited
 
     def failures
       @failures ||= assertions.select { |assert| !assert[:result] }
+    end
+
+    def errors
+      # TODO Check for "Died on test" at the beginning of a failure message and make that an error
     end
   end
 end

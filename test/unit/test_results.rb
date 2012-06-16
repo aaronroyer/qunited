@@ -1,16 +1,22 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class TestResults < MiniTest::Unit::TestCase
+
   def test_gives_you_various_counts
     results = QUnited::Results.new test_module_results
-    assert_equal 3, results.total_tests, 'Gives total tests count'
-    assert_equal 4, results.total_assertions, 'Gives total assertions count'
-    assert_equal 0, results.total_failures, 'Gives total failures count when there are none'
+    assert results.passed?, 'passed? is true when all tests have passed'
+    assert !results.failed?, 'failed? is false when all tests have passed'
+    assert_equal 3, results.total_tests, 'total_tests gives total tests count'
+    assert_equal 4, results.total_assertions, 'total_assertions gives total assertions count'
+    assert_equal 0, results.total_failures, 'total_failures gives total failures count when there are none'
 
     other_results = QUnited::Results.new test_failed_module_results
-    assert_equal 4, other_results.total_tests, 'Gives total tests count'
-    assert_equal 5 + 1, other_results.total_assertions, 'Gives total assertions count'
-    assert_equal 4, other_results.total_failures, 'Gives total failures count when there are some'
+
+    assert !other_results.passed?, 'passed? is false when there are failures'
+    assert other_results.failed?, 'failed? is true when there are failures'
+    assert_equal 4, other_results.total_tests, 'total_tests gives total tests count'
+    assert_equal 5 + 1, other_results.total_assertions, 'total_assertions gives total assertions count'
+    assert_equal 4, other_results.total_failures, 'total_failures gives total failures count when there are some'
   end
 
   def test_basic_output
@@ -257,4 +263,5 @@ class TestResults < MiniTest::Unit::TestCase
       }
     ]
   end
+
 end
