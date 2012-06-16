@@ -9,6 +9,7 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal 3, results.total_tests, 'total_tests gives total tests count'
     assert_equal 4, results.total_assertions, 'total_assertions gives total assertions count'
     assert_equal 0, results.total_failures, 'total_failures gives total failures count when there are none'
+    assert_equal 0, results.total_errors, 'total_errors gives total errors when there are none'
 
     other_results = QUnited::Results.new test_failed_module_results
 
@@ -17,6 +18,7 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal 4, other_results.total_tests, 'total_tests gives total tests count'
     assert_equal 5 + 1, other_results.total_assertions, 'total_assertions gives total assertions count'
     assert_equal 4, other_results.total_failures, 'total_failures gives total failures count when there are some'
+    assert_equal 0, results.total_errors, 'total_errors gives total errors when there are none'
   end
 
   def test_basic_output
@@ -61,7 +63,7 @@ class TestResults < MiniTest::Unit::TestCase
   end
 
   # Test results are converted to JavaScript appropriate null, not nil
-  def test_null_failures
+  def test_null_failures_output
     results = QUnited::Results.new test_failed_module_results_with_null
 
     failure = results.failures_output_array[0].split("\n")
@@ -71,6 +73,19 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal 'Was it null?', failure[2]
     assert_equal 'Expected: 5', failure[3]
     assert_equal '  Actual: null', failure[4]
+  end
+
+  def test_errors
+    results = QUnited::Results.new test_failed_module_results_with_an_error
+
+    assert results.failed?, 'failed? is true when there are errors'
+    assert_equal 2, results.total_tests, 'total_tests gives total tests count'
+    assert_equal 3, results.total_assertions, 'total_assertions gives total assertions count'
+    assert_equal 0, results.total_failures, 'total_failures gives total failures count when there are none'
+    assert_equal 1, results.total_errors, 'total_errors gives total errors when there are none'
+
+    assert_equal "2 tests, 3 assertions, 0 failures, 1 errors, 0 skips", results.bottom_line
+    assert_equal "E.", results.dots
   end
 
   private
@@ -257,6 +272,56 @@ class TestResults < MiniTest::Unit::TestCase
             :file => "test/javascripts/test_module.js",
             :duration => 0.002,
             :failed => 1,
+            :total => 1
+          }
+        ]
+      }
+    ]
+  end
+
+  def test_failed_module_results_with_an_error
+    [
+      {
+        :name => "The module",
+        :tests =>  [
+          {
+            :name => "Error test",
+            :assertion_data => [
+              {
+                :result => true,
+                :message => "This one fine",
+                :actual => "String",
+                :expected => "String"
+              },
+              {
+                :result => false,
+                :message => "Died on test #3: asdf is undefined"
+              }
+
+            ],
+            :start => DateTime.parse('2012-06-14T13:24:11+00:00'),
+            :assertions => 2,
+            :file => "test/javascripts/test_module.js",
+            :duration => 0.002,
+            :failed => 1,
+            :total => 2
+          },
+          {
+            :name => "OK test",
+            :assertion_data => [
+              {
+                :result => true,
+                :message => "All good",
+                :actual => 5,
+                :expected => 5
+              }
+
+            ],
+            :start => DateTime.parse('2012-06-14T13:24:11+00:00'),
+            :assertions => 1,
+            :file => "test/javascripts/test_module.js",
+            :duration => 0.002,
+            :failed => 0,
             :total => 1
           }
         ]

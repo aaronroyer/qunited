@@ -1,6 +1,8 @@
 require File.expand_path('../../test_helper', __FILE__)
 require 'stringio'
 
+# Test running tests with the Rhino test runner. These
+# are really more integration tests than unit tests.
 class TestRhinoRunner < MiniTest::Unit::TestCase
 
   def test_running_basic_tests
@@ -73,8 +75,9 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
     assert_equal 2, results.total_tests, 'Correct number of tests run'
     # "assertions" count will actually be 1, plus the unefined error being recorded
     assert_equal 2, results.total_assertions, 'Correct number of assertions executed'
-    # The crashed test fails, but the other should be allowed to succeed
-    assert_equal 1, results.total_failures, 'Correct number of failures given'
+    assert_equal 0, results.total_failures, 'Correct number of failures given'
+    # The crashed test errors, but the other should be allowed to succeed
+    assert_equal 1, results.total_errors, 'Correct number of errors given'
   end
 
   def test_syntax_error_in_test
@@ -98,7 +101,6 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
     results = runner.results
     assert results.failed?, 'No tests in a file means failure'
   end
-
 
   private
 

@@ -17,7 +17,7 @@ module QUnited
     end
 
     def passed?
-      total_failures.zero?
+      total_failures.zero? && total_errors.zero?
     end
 
     def failed?
@@ -25,11 +25,20 @@ module QUnited
     end
 
     def dots
-      tests.map { |test| test[:failed] > 0 ? 'F' : '.' }.join
+      tests.map do |test|
+        if test[:failed] == 0
+          '.'
+        elsif test[:assertion_data].find { |assert| assert[:message] =~ /^Died on test/ }
+          'E'
+        else
+          'F'
+        end
+      end.join
     end
 
     def bottom_line
-      "#{total_tests} tests, #{total_assertions} assertions, #{total_failures} failures, 0 errors, 0 skips"
+      "#{total_tests} tests, #{total_assertions} assertions, " +
+      "#{total_failures} failures, #{total_errors} errors, 0 skips"
     end
 
     def failures_output
@@ -66,11 +75,15 @@ module QUnited
     end
 
     def total_assertions
-      tests.inject(0) { |asserts, test| asserts += test[:assertions] }
+      assertions.size
     end
 
     def total_failures
-      tests.inject(0) { |fails, test| fails += test[:failed] }
+      failures.size
+    end
+
+    def total_errors
+      errors.size
     end
 
     def raw_results
@@ -106,11 +119,17 @@ module QUnited
     end
 
     def failures
-      @failures ||= assertions.select { |assert| !assert[:result] }
+      @failures ||= compile_failures_and_errors[0]
     end
 
     def errors
-      # TODO Check for "Died on test" at the beginning of a failure message and make that an error
+      @errors ||= compile_failures_and_errors[1]
+    end
+
+    def compile_failures_and_errors
+      @failures, @errors = assertions.select { |assert| !assert[:result] }.partition do |assert|
+        assert[:message] !~ /^Died on test/
+      end
     end
   end
 end
