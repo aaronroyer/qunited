@@ -2,12 +2,85 @@ module QUnited
 
   # Simple tests results compiler. Takes a raw results hash that was produced by a runner.
   class Results
-    def initialize(modules_results_array)
-      @data = modules_results_array
-      @data.freeze
+    class ModuleResults
+      def initialize(data)
+        @data = data
+      end
+
+      def tests
+        @tests ||= @data[:tests].map { |test_data| TestResults.new test_data, @data[:name] }
+      end
     end
 
-    # Results output methods
+    class TestResults
+      def initialize(data, module_name)
+        @data, @module_name = data, module_name
+      end
+
+      def assertions
+        @data[:assertion_data].map do |assertion_data|
+          AssertionResults.new assertion_data, @data[:name], @module_name, @data[:file]
+        end
+      end
+
+      def passed?; result == :passed end
+      def failed?; result == :failed end
+      def error?; result == :error end
+
+      def result
+        @result ||= if assertions.find { |a| a.error? }
+          :error
+        else
+          assertions.find { |a| a.failed? } ? :failed : :passed
+        end
+      end
+
+      def to_s; passed? ? '.' : (error? ? 'E' : 'F') end
+    end
+
+    class AssertionResults
+      def initialize(data, test_name, module_name, file)
+        @data, @test_name, @module_name, @file = data, test_name, module_name, file
+      end
+
+      def message
+        @data[:message]
+      end
+
+      def result
+        if @data[:result]
+          :passed
+        else
+          @data[:message] =~ /^Died on test/ ? :error : :failed
+        end
+      end
+
+      def passed?; result == :passed end
+      def failed?; result == :failed end
+      def error?; result == :error end
+
+      def output(count)
+        return "" if passed?
+        msg = "  " + (count ? "#{count.to_s}) " : "")
+        msg << "#{error? ? 'Error' : 'Failure'}:\n"
+        msg << "#{@test_name} (#{@module_name}) [#{@file}]\n"
+        msg << "#{@data[:message] || 'Failed assertion, no message given.'}\n"
+
+        # Results can be nil. Also, JavaScript nulls will be converted, by the YAML serializer, to
+        # Ruby nil. Convert that back to 'null' for the output.
+        if @data.key? :expected
+          expected, actual = @data[:expected], @data[:actual]
+          msg << "Expected: #{expected.nil? ? 'null' : expected.inspect}\n"
+          msg <<   "  Actual: #{actual.nil? ? 'null' : actual.inspect}\n"
+        end
+        msg
+      end
+    end
+
+    def initialize(modules_results_array)
+      @data = modules_results_array.freeze
+      @module_results = @data.map { |module_data| ModuleResults.new module_data }
+    end
 
     def to_s
       all_output = dots
@@ -25,15 +98,7 @@ module QUnited
     end
 
     def dots
-      tests.map do |test|
-        if test[:failed] == 0
-          '.'
-        elsif test[:assertion_data].find { |assert| assert[:message] =~ /^Died on test/ }
-          'E'
-        else
-          'F'
-        end
-      end.join
+      tests.map { |test| test.to_s }.join
     end
 
     def bottom_line
@@ -48,88 +113,36 @@ module QUnited
     # Array of failure output block strings
     def failures_output_array
       return @failures_output_array if @failures_output_array
-
-      failures_output = []
-      failures.each_with_index do |failure, i|
-        out =  "  #{i+1}) Failure:\n"
-        out << "#{failure[:test_name]} (#{failure[:module_name]}) [#{failure[:file]}]\n"
-        out << "#{failure[:message] || 'Failed assertion, no message given.'}\n"
-
-        # Results can be nil. Also, JavaScript nulls will be converted, by the YAML serializer, to
-        # Ruby nil. Convert that back to 'null' for the output.
-        if failure.key? :expected
-          expected, actual = failure[:expected], failure[:actual]
-          out << "Expected: #{expected.nil? ? 'null' : expected.inspect}\n"
-          out <<   "  Actual: #{actual.nil? ? 'null' : actual.inspect}\n"
-        end
-
-        failures_output << out
-      end
-      @failures_output_array = failures_output
+      count = 0
+      @failures_output_array = (failures + errors).map { |failure| failure.output(count += 1) }
     end
 
     # Other data compilation methods
 
     def total_tests
-      tests.size
+      @total_tests ||= @module_results.inject(0) { |count, mod| count += mod.tests.size }
     end
 
-    def total_assertions
-      assertions.size
-    end
-
-    def total_failures
-      failures.size
-    end
-
-    def total_errors
-      errors.size
-    end
-
-    def raw_results
-      @data
-    end
+    def total_assertions; assertions.size end
+    def total_failures; failures.size end
+    def total_errors; errors.size end
 
     private
 
-    def modules
-      @data
-    end
-
     def tests
-      @tests ||= modules.inject([]) do |tests, mod|
-        tests += mod[:tests].map do |test_data|
-          # Add module name for convenience in writing results
-          test_data[:module_name] = mod[:name]
-          test_data
-        end
-      end
+      @tests ||= @module_results.inject([]) { |tests, mod| tests += mod.tests }
     end
 
     def assertions
-      @assertions ||= tests.inject([]) do |asserts, test|
-        asserts += test[:assertion_data].map do |assertion_data|
-          # Add test, module, and file name for convenience in writing results
-          assertion_data[:test_name] = test[:name]
-          assertion_data[:module_name] = test[:module_name]
-          assertion_data[:file] = test[:file]
-          assertion_data
-        end
-      end
+      @assertions ||= tests.inject([]) { |asserts, test| asserts += test.assertions }
     end
 
     def failures
-      @failures ||= compile_failures_and_errors[0]
+      @failures ||= assertions.select { |assert| assert.failed? }
     end
 
     def errors
-      @errors ||= compile_failures_and_errors[1]
-    end
-
-    def compile_failures_and_errors
-      @failures, @errors = assertions.select { |assert| !assert[:result] }.partition do |assert|
-        assert[:message] !~ /^Died on test/
-      end
+      @errors ||= assertions.select { |assert| assert.error? }
     end
   end
 end

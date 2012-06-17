@@ -75,7 +75,7 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal '  Actual: null', failure[4]
   end
 
-  def test_errors
+  def test_errors_and_error_output
     results = QUnited::Results.new test_failed_module_results_with_an_error
 
     assert results.failed?, 'failed? is true when there are errors'
@@ -83,6 +83,12 @@ class TestResults < MiniTest::Unit::TestCase
     assert_equal 3, results.total_assertions, 'total_assertions gives total assertions count'
     assert_equal 0, results.total_failures, 'total_failures gives total failures count when there are none'
     assert_equal 1, results.total_errors, 'total_errors gives total errors when there are none'
+
+    error = results.failures_output_array[0].split("\n")
+    assert_equal 3, error.size
+    assert_equal '  1) Error:', error[0]
+    assert_equal 'Error test (The module) [test/javascripts/test_module.js]', error[1]
+    assert_equal 'Died on test #3: asdf is undefined', error[2]
 
     assert_equal "2 tests, 3 assertions, 0 failures, 1 errors, 0 skips", results.bottom_line
     assert_equal "E.", results.dots
