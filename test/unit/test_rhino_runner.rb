@@ -6,9 +6,7 @@ require 'stringio'
 class TestRhinoRunner < MiniTest::Unit::TestCase
 
   def test_running_basic_tests
-    Dir.chdir File.join(FIXTURES_DIR, 'basic_project')
-    runner = QUnited::Runner::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
-    results = runner.run.results
+    results = runner_for_project('basic_project').run.results
     assert_equal 3, results.total_tests, 'Correct number of tests run'
     assert_equal 4, results.total_assertions, 'Correct number of assertions executed'
     assert_equal 0, results.total_failures, 'Correct number of failures given'
@@ -16,18 +14,14 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
 
   # Make sure we can run tests with DOM operations
   def test_running_dom_tests
-    Dir.chdir File.join(FIXTURES_DIR, 'dom_project')
-    runner = QUnited::Runner::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
-    results = runner.run.results
+    results = runner_for_project('dom_project').run.results
     assert_equal 1, results.total_tests, 'Correct number of tests run'
     assert_equal 2, results.total_assertions, 'Correct number of assertions executed'
     assert_equal 0, results.total_failures, 'Correct number of failures given'
   end
 
   def test_failures_are_recorded_correctly
-    Dir.chdir File.join(FIXTURES_DIR, 'failures_project')
-    runner = QUnited::Runner::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
-    results = runner.run.results
+    results = runner_for_project('failures_project').run.results
     assert_equal 4, results.total_tests, 'Correct number of tests run'
     # QUnit calls the log callback (the same it calls for assertions) every time there
     # is a failed expect(num). So add one to this total.
@@ -36,7 +30,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_undefined_error_in_source
-    runner = QUnited::Runner::Rhino.new(
+    runner = QUnited::JsRunner::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/undefined_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
 
@@ -50,7 +44,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_syntax_error_in_source
-    runner = QUnited::Runner::Rhino.new(
+    runner = QUnited::JsRunner::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/syntax_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
 
@@ -64,7 +58,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_undefined_error_in_test
-    runner = QUnited::Runner::Rhino.new(
+    runner = QUnited::JsRunner::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_undefined_error.js')])
 
@@ -81,7 +75,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_syntax_error_in_test
-    runner = QUnited::Runner::Rhino.new(
+    runner = QUnited::JsRunner::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_syntax_error.js'),
         File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
@@ -93,7 +87,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_no_tests_in_test_file_means_failure
-    runner = QUnited::Runner::Rhino.new(
+    runner = QUnited::JsRunner::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_tests.js')])
     runner.run
@@ -103,6 +97,11 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   private
+
+  def runner_for_project(project_name)
+    Dir.chdir File.join(FIXTURES_DIR, project_name)
+    QUnited::JsRunner::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
+  end
 
   def capture_stderr
     previous_stderr, $stderr = $stderr, StringIO.new

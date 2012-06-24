@@ -89,6 +89,10 @@ module QUnited
       all_output
     end
 
+    def to_i
+      passed? ? 0 : 1
+    end
+
     def passed?
       total_failures.zero? && total_errors.zero?
     end

@@ -4,7 +4,7 @@ require 'yaml'
 require 'open3'
 
 module QUnited
-  module Runner
+  module JsRunner
     class Rhino < Base
       def can_run?
         # TODO: test that you have Java
