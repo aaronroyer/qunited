@@ -22,6 +22,10 @@ module QUnited
         false
       end
 
+      def name
+        self.class.name.split('::')[-1]
+      end
+
       def run
         raise 'run not implemented'
       end

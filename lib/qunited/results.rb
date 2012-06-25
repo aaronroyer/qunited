@@ -35,6 +35,8 @@ module QUnited
         end
       end
 
+      def duration; @data[:duration] end
+
       def to_s; passed? ? '.' : (error? ? 'E' : 'F') end
     end
 
@@ -83,10 +85,13 @@ module QUnited
     end
 
     def to_s
-      all_output = dots
-      all_output << "\n\n#{failures_output}" unless failures_output.empty?
-      all_output << "\n\n#{bottom_line}"
-      all_output
+      return <<-OUTPUT
+#{dots}
+#{"\n\n#{failures_output}\n\n" unless failures_output.empty?}
+#{times_line}
+
+#{bottom_line}
+      OUTPUT
     end
 
     def to_i
@@ -110,6 +115,11 @@ module QUnited
       "#{total_failures} failures, #{total_errors} errors, 0 skips"
     end
 
+    def times_line
+      "Finished in #{"%.6g" % total_time} seconds, #{"%.6g" % (total_tests/total_time)} tests/s, " +
+      "#{"%.6g" % (total_assertions/total_time)} assertions/s."
+    end
+
     def failures_output
       failures_output_array.join("\n")
     end
@@ -121,8 +131,6 @@ module QUnited
       @failures_output_array = (failures + errors).map { |failure| failure.output(count += 1) }
     end
 
-    # Other data compilation methods
-
     def total_tests
       @total_tests ||= @module_results.inject(0) { |count, mod| count += mod.tests.size }
     end
@@ -130,6 +138,10 @@ module QUnited
     def total_assertions; assertions.size end
     def total_failures; failures.size end
     def total_errors; errors.size end
+
+    def total_time
+      @total_time ||= tests.inject(0) { |total, test| total += test.duration }
+    end
 
     private
 

@@ -4,6 +4,9 @@ module QUnited
       js_runner_klass = self.js_runner
       # TODO: test that this JsRunner can run with current environment
       runner = js_runner_klass.new(js_source_files, js_test_files)
+
+      puts "\nRunning JavaScript tests with #{runner.name}\n\n"
+
       results = runner.run.results
       puts results
       results.to_i

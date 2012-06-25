@@ -13,14 +13,11 @@ loaded for running each test.
 JS_TEST_FILES are files that contain the QUnit tests to run.
 and (optional) NAME
 
-Alternatively, use 'ruku --web' to start the server for the web client. You
-should then be able to visit http://localhost:3030 to see the interface. You
-can specify a different port with '-p PORT'.
-
 Options:
   -h, --help                  Show this message
   HELP_TEXT
-else
-  js_source_files, js_test_files = ARGV.join(' ').split('--').map { |file_list| file_list.split(' ') }
-  exit QUnited::Runner.run(js_source_files, js_test_files)
+  exit
 end
+
+js_source_files, js_test_files = ARGV.join(' ').split('--').map { |file_list| file_list.split(' ') }
+exit QUnited::Runner.run(js_source_files, js_test_files)
