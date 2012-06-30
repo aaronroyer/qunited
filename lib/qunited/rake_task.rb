@@ -2,6 +2,12 @@ module QUnited
   class RakeTask < ::Rake::TaskLib
     include ::Rake::DSL if defined?(::Rake::DSL)
 
+    # Name of task.
+    #
+    # default:
+    #   :qunited
+    attr_accessor :name
+
     # Glob pattern to match JavaScript source files (and any dependencies). Note that the
     # order will be indeterminate so if your JavaScript files must be included in a particular
     # order you will have to use source_files=(files_array).
@@ -18,9 +24,14 @@ module QUnited
 
     # Glob pattern to match QUnit test files.
     #
+    # If an array of test files is set with test_files=(files) then this will be ignored.
+    #
     # default:
     #   'test/javascripts/**/*.js'
     attr_accessor :test_files_pattern
+
+    # Array of QUnit test files.
+    attr_accessor :test_files
 
     # Use verbose output. If this is true, the task will print the QUnited command to stdout.
     #
@@ -28,12 +39,14 @@ module QUnited
     #   true
     attr_accessor :verbose
 
-    def initialize
+    def initialize(*args)
+      @name = args.shift || :qunited
+
       yield self if block_given?
 
       desc('Run QUnit JavaScript tests') unless ::Rake.application.last_comment
 
-      task 'qunited' do
+      task name do
         RakeFileUtils.send(:verbose, verbose) do
           if source_files_to_include.empty?
             msg = "No JavaScript source files specified"
@@ -64,10 +77,10 @@ module QUnited
     end
 
     def test_files_to_run
-      pattern_to_filelist test_files_pattern
+      test_files || pattern_to_filelist(test_files_pattern)
     end
 
-    def pattern_to_filelist
+    def pattern_to_filelist(pattern)
       FileList[pattern].map { |f| f.gsub(/"/, '\"').gsub(/'/, "\\\\'") }
     end
   end
