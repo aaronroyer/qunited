@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = QUnited::VERSION
   s.authors     = ["Aaron Royer"]
   s.email       = ["aaronroyer@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/aaronroyer/qunited"
   s.summary     = %q{QUnit tests in your build}
   s.description = %q{QUnited runs headless QUnit tests as part of your normal build}
 
@@ -17,8 +17,4 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-
-  # specify any dependencies here; for example:
-  # s.add_development_dependency "rspec"
-  # s.add_runtime_dependency "rest-client"
 end
