@@ -44,7 +44,7 @@ Right now only Rhino is set up to run tests. This means you'll need to have Java
 
 ## Attribution
 
-QUnited builds on work done for the following projects:
+QUnited builds on work done on the following projects:
 
 [QUnit](https://github.com/jquery/qunit/) QUnit is a nice little JavaScript testing library and is, of course, central to what this project does.
 
