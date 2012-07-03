@@ -3,7 +3,7 @@ require 'stringio'
 
 # Test running tests with the Rhino test runner. These
 # are really more integration tests than unit tests.
-class TestRhinoRunner < MiniTest::Unit::TestCase
+class TestRhinoDriver < MiniTest::Unit::TestCase
 
   def test_running_basic_tests
     results = runner_for_project('basic_project').run.results
@@ -30,7 +30,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_undefined_error_in_source
-    runner = QUnited::JsRunner::Rhino.new(
+    runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/undefined_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
 
@@ -44,7 +44,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_syntax_error_in_source
-    runner = QUnited::JsRunner::Rhino.new(
+    runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/syntax_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
 
@@ -58,7 +58,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_undefined_error_in_test
-    runner = QUnited::JsRunner::Rhino.new(
+    runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_undefined_error.js')])
 
@@ -75,7 +75,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_syntax_error_in_test
-    runner = QUnited::JsRunner::Rhino.new(
+    runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_syntax_error.js'),
         File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
@@ -87,7 +87,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
   end
 
   def test_no_tests_in_test_file_means_failure
-    runner = QUnited::JsRunner::Rhino.new(
+    runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
       [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_tests.js')])
     runner.run
@@ -100,7 +100,7 @@ class TestRhinoRunner < MiniTest::Unit::TestCase
 
   def runner_for_project(project_name)
     Dir.chdir File.join(FIXTURES_DIR, project_name)
-    QUnited::JsRunner::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
+    QUnited::Driver::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
   end
 
   def capture_stderr

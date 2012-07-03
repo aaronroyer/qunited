@@ -1,5 +1,5 @@
 module QUnited
-  module JsRunner
+  module Driver
     class Base
       attr_reader :results
 
