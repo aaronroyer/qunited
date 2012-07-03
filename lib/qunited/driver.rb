@@ -1,2 +1,2 @@
 require 'qunited/driver/base'
-require 'qunited/driver/rhino'
+require 'qunited/driver/rhino/rhino'

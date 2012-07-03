@@ -11,8 +11,7 @@ module QUnited
       end
 
       def run
-        js_dir = File.expand_path('../rhino/js', __FILE__)
-
+        js_dir = File.expand_path('../js', __FILE__)
         js_jar, runner = File.join(js_dir, 'js.jar'), File.join(js_dir, 'qunit-runner.js')
 
         source_files_args = @source_files.map { |sf| %{"#{sf}"} }.join(' ')
