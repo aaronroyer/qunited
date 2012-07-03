@@ -1,7 +1,7 @@
 module QUnited
   module Driver
     class Base
-      attr_reader :results
+      attr_reader :results, :source_files, :test_files
 
       # Array of file names? Glob pattern?
       def initialize(source_files, test_files)
