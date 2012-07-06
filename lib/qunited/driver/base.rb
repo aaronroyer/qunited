@@ -3,6 +3,20 @@ module QUnited
     class Base
       attr_reader :results, :source_files, :test_files
 
+      # Finds an executable on the PATH. Returns the absolute path of the
+      # executable if found, otherwise nil.
+      def self.which(cmd)
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+        ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+          exts.each do |ext|
+            exe = "#{path}/#{cmd}#{ext}"
+            return exe if File.executable? exe
+          end
+        end
+        return nil
+      end
+
+      # Get the path of the common (to all drivers) supporting files directory
       def self.support_dir
         @@support_dir = File.expand_path('../support', __FILE__)
       end

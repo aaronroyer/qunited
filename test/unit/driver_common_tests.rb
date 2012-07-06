@@ -1,6 +1,13 @@
 # Common driver tests that should pass for any implementation of
 # QUnited::Driver::Base. There are also a few utility methods included.
 module QUnited::DriverCommonTests
+  def test_driver_available
+    assert driver_class.available?, 'Driver should be available - if it is not then ' +
+      'either the available? method has a bug or you do not have the proper environment ' +
+      "to run the driver; check the available? method in the #{driver_class} driver class " +
+      'to get an idea of whether you should be able to run the driver'
+  end
+
   def test_running_basic_tests
     results = run_for_project('basic_project')
     assert_equal 3, results.total_tests, 'Correct number of tests run'

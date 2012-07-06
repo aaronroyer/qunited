@@ -5,8 +5,17 @@ require 'open3'
 module QUnited
   module Driver
     class Rhino < Base
-      def can_run?
-        # TODO: test that you have Java
+      def self.available?
+        java_exe = which('java')
+        if java_exe
+          stdin, stdout, stderr = Open3.popen3('java -version')
+          begin
+            version = Float(stderr.read.split("\n").first[/(\d+\.\d+)/, 1])
+            version >= 1.1
+          rescue
+            false
+          end
+        end
       end
 
       def run

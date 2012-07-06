@@ -7,6 +7,14 @@ require 'open3'
 module QUnited
   module Driver
     class PhantomJs < Base
+      def self.available?
+        !!which('phantomjs')
+      end
+
+      def name
+        "PhantomJS" # Slightly more accurate than our class name
+      end
+
       def run
         self.tests_file = Tempfile.new(['tests_page', '.html'])
         tests_file.write(tests_page_content)
