@@ -2,7 +2,7 @@
 
 QUnited is a tool to run headless JavaScript tests with QUnit.
 
-Right now it exists in a proof-of-concept phase and only runs tests with Rhino/Envjs. Give it a try and let me know if you have any feedback.
+Tests are run with PhantomJS if available, otherwise Rhino (Java) is used. Give it a try and let me know if you have any feedback.
 
 ## Installation
 
@@ -40,17 +40,25 @@ Note that you can also use an array to configure the test files but a glob patte
 
 ## Dependencies
 
-Right now only Rhino is set up to run tests. This means you'll need to have Java (version 1.1 minimum) in your path to use QUnited.
+- PhantomJS
 
-## Attribution
+OR
 
-QUnited builds on work done on the following projects:
+- Java (version 1.1 minimum)
 
-[QUnit](https://github.com/jquery/qunit/) QUnit is a nice little JavaScript testing library and is, of course, central to what this project does.
+PhantomJS is preferred since it uses real WebKit and is faster. Running Rhino on Java should be considered a fallback.
 
-[Rhino](http://www.mozilla.org/rhino/) Rhino is a JavaScript interpreter that runs on the JVM.
+## Credits
 
-[Envjs](http://www.envjs.com/) Envjs is a simulated browser environment written in JavaScript.
+QUnited builds on the following projects:
+
+[QUnit](https://github.com/jquery/qunit/) is a nice little JavaScript testing library and is, of course, central to what this project does.
+
+[PhantomJS](http://phantomjs.org/) is a headless WebKit with JavaScript API.
+
+[Rhino](http://www.mozilla.org/rhino/) is a JavaScript interpreter that runs on the JVM.
+
+[Envjs](http://www.envjs.com/) is a simulated browser environment written in JavaScript.
 
 ## License
 
