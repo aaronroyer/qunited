@@ -37,28 +37,6 @@ module QUnited
       def name
         self.class.name.split('::')[-1]
       end
-
-      protected
-
-      def clean_up_results(results)
-        results.map! { |mod_results| symbolize_keys mod_results }
-        results.each do |mod_results|
-          mod_results[:tests].map! { |test| clean_up_test_results(symbolize_keys(test)) }
-        end
-      end
-
-      def clean_up_test_results(test_results)
-        test_results[:start] = DateTime.parse(test_results[:start])
-        test_results[:duration] = Float(test_results[:duration])
-        test_results[:assertion_data].map! { |data| symbolize_keys data }
-        test_results
-      end
-
-      def symbolize_keys(hash)
-        new_hash = {}
-        hash.keys.each { |key| new_hash[key.to_sym] = hash[key] }
-        new_hash
-      end
     end
   end
 end

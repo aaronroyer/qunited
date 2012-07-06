@@ -1,33 +1,10 @@
 require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path('../driver_common_tests', __FILE__)
 require 'stringio'
 
-# Test running tests with the Rhino test runner. These
-# are really more integration tests than unit tests.
+# Test running tests with the Rhino driver.
 class TestRhinoDriver < MiniTest::Unit::TestCase
-
-  def test_running_basic_tests
-    results = run_for_project('basic_project')
-    assert_equal 3, results.total_tests, 'Correct number of tests run'
-    assert_equal 4, results.total_assertions, 'Correct number of assertions executed'
-    assert_equal 0, results.total_failures, 'Correct number of failures given'
-  end
-
-  # Make sure we can run tests with DOM operations
-  def test_running_dom_tests
-    results = run_for_project('dom_project')
-    assert_equal 1, results.total_tests, 'Correct number of tests run'
-    assert_equal 2, results.total_assertions, 'Correct number of assertions executed'
-    assert_equal 0, results.total_failures, 'Correct number of failures given'
-  end
-
-  def test_failures_are_recorded_correctly
-    results = run_for_project('failures_project')
-    assert_equal 4, results.total_tests, 'Correct number of tests run'
-    # QUnit calls the log callback (the same it calls for assertions) every time there
-    # is a failed expect(num). So add one to this total.
-    assert_equal 5 + 1, results.total_assertions, 'Correct number of assertions executed'
-    assert_equal 4, results.total_failures, 'Correct number of failures given'
-  end
+  include QUnited::DriverCommonTests
 
   def test_undefined_error_in_source
     runner = QUnited::Driver::Rhino.new(
@@ -74,18 +51,6 @@ class TestRhinoDriver < MiniTest::Unit::TestCase
     assert_equal 1, results.total_errors, 'Correct number of errors given'
   end
 
-  def test_syntax_error_in_test
-    runner = QUnited::Driver::Rhino.new(
-      [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
-      [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_syntax_error.js'),
-        File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
-
-    stderr = capture_stderr { runner.run }
-    assert stderr.size > 10, 'Got some stderr output to describe the crash'
-    results = runner.results
-    assert runner.results.failed?, 'Should fail if syntax error in test'
-  end
-
   def test_no_tests_in_test_file_means_failure
     runner = QUnited::Driver::Rhino.new(
       [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
@@ -98,23 +63,8 @@ class TestRhinoDriver < MiniTest::Unit::TestCase
 
   private
 
-  def run_for_project(project_name)
-    runner = runner_for_project(project_name)
-    runner.run
-    runner.results
-  end
-
-  def runner_for_project(project_name)
-    Dir.chdir File.join(FIXTURES_DIR, project_name)
-    QUnited::Driver::Rhino.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
-  end
-
-  def capture_stderr
-    previous_stderr, $stderr = $stderr, StringIO.new
-    yield
-    $stderr.string
-  ensure
-    $stderr = previous_stderr
+  def driver_class
+    QUnited::Driver::Rhino
   end
 
 end

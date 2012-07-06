@@ -1,14 +1,14 @@
-require 'erb'
+require 'pathname'
 require 'tempfile'
 require 'fileutils'
-require 'yaml'
+require 'erb'
 require 'open3'
 
 module QUnited
   module Driver
     class PhantomJs < Base
       def run
-        tests_file = Tempfile.new(['tests_page', '.html'])
+        self.tests_file = Tempfile.new(['tests_page', '.html'])
         tests_file.write(tests_page_content)
         tests_file.close
 
@@ -19,15 +19,18 @@ module QUnited
         cmd << %{#{tests_file.path} #{results_file.path}}
 
         Open3.popen3(cmd) do |stdin, stdout, stderr|
-          unless (out = stdout.read).strip.empty? then $stderr.puts(out) end
-          unless (err = stderr.read).strip.empty? then $stderr.puts(err) end
+          # PhantomJS sometimes puts error messages to stdout - redirect them to stderr
+          [stdout, stderr].each do |io|
+            unless (io_str = io.read).strip.empty? then $stderr.puts(io_str) end
+          end
         end
 
-        @raw_results = clean_up_results(YAML.load(IO.read(results_file)))
-        @results = ::QUnited::Results.new @raw_results
+        @results = ::QUnited::Results.from_javascript_produced_yaml(IO.read(results_file))
       end
 
       private
+
+      attr_accessor :tests_file
 
       def tests_page_content
         ERB.new(IO.read(File.expand_path('../support/tests_page.html.erb', __FILE__))).result(binding)

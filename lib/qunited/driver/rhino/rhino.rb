@@ -1,6 +1,5 @@
 require 'tempfile'
 require 'fileutils'
-require 'yaml'
 require 'open3'
 
 module QUnited
@@ -17,11 +16,11 @@ module QUnited
         source_files_args = @source_files.map { |sf| %{"#{sf}"} }.join(' ')
         test_files_args = @test_files.map { |tf| %{"#{tf}"} }.join(' ')
 
-        tmp_file = Tempfile.new('qunited_results')
-        tmp_file.close
+        results_file = Tempfile.new('qunited_results')
+        results_file.close
 
         cmd = %{java -jar "#{js_jar}" -opt -1 "#{runner}" }
-        cmd << %{"#{QUnited::Driver::Base.support_dir}" "#{support_dir}" "#{tmp_file.path}"}
+        cmd << %{"#{QUnited::Driver::Base.support_dir}" "#{support_dir}" "#{results_file.path}"}
         cmd << " #{source_files_args} -- #{test_files_args}"
 
         # Swallow stdout but allow stderr to get blasted out to console - if there are uncaught
@@ -33,9 +32,7 @@ module QUnited
           unless (err = stderr.read).strip.empty? then $stderr.puts(err) end
         end
 
-        @raw_results = clean_up_results(YAML.load(IO.read(tmp_file)))
-
-        @results = ::QUnited::Results.new @raw_results
+        @results = ::QUnited::Results.from_javascript_produced_yaml(IO.read(results_file))
       end
     end
   end

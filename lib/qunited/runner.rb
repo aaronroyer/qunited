@@ -7,7 +7,7 @@ module QUnited
 
       puts "\n# Running JavaScript tests with #{runner.name}:\n\n"
 
-      results = runner.run.results
+      results = runner.run
       puts results
       results.to_i
     end
