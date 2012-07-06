@@ -5,6 +5,9 @@ require 'open3'
 module QUnited
   module Driver
     class Rhino < Base
+
+      # Determines whether this driver available to use. Checks whether java
+      # is on the PATH and whether Java is version 1.1 or greater.
       def self.available?
         java_exe = which('java')
         if java_exe
