@@ -37,11 +37,21 @@ module QUnited
       end
 
       def script_tag(file)
-        return <<-SCRIPT_ELEMENT
+        js_file_path, tests_file_path = Pathname.new(file).realpath, Pathname.new(tests_file)
+        begin
+          rel_path = js_file_path.relative_path_from(tests_file_path)
+          # Attempt to convert paths to relative URLs if Windows... should really test this
+          return %{<script type="text/javascript" src="#{rel_path.to_s.gsub(/\\/, '/')}"></script>}
+        rescue ArgumentError
+          # If we cannot get a relative path to the js file then just put the contents
+          # of the file inline. This can happen for a few reasons, like if the drive
+          # letter is different on Windows.
+          return <<-SCRIPT_ELEMENT
 <script type="text/javascript">
   #{IO.read(file)}
 </script>
-        SCRIPT_ELEMENT
+          SCRIPT_ELEMENT
+        end
       end
     end
   end
