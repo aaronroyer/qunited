@@ -1,3 +1,5 @@
+require 'yaml'
+
 module QUnited
 
   # Simple tests results compiler. Takes a raw results hash that was produced by a runner.
@@ -77,6 +79,10 @@ module QUnited
         end
         msg
       end
+    end
+
+    def self.from_javascript_produced_yaml(yaml)
+      self.new clean_up_results(YAML.load(yaml))
     end
 
     def initialize(modules_results_array)
@@ -159,6 +165,29 @@ module QUnited
 
     def errors
       @errors ||= assertions.select { |assert| assert.error? }
+    end
+
+    # The YAML serializing JavaScript library does not put things into the cleanest form
+    # for us to work with. This turns the String keys into Symbols and converts Strings
+    # representing dates and numbers into their appropriate objects.
+    def self.clean_up_results(results)
+      results.map! { |mod_results| symbolize_keys mod_results }
+      results.each do |mod_results|
+        mod_results[:tests].map! { |test| clean_up_test_results(symbolize_keys(test)) }
+      end
+    end
+
+    def self.clean_up_test_results(test_results)
+      test_results[:start] = DateTime.parse(test_results[:start])
+      test_results[:duration] = Float(test_results[:duration])
+      test_results[:assertion_data].map! { |data| symbolize_keys data }
+      test_results
+    end
+
+    def self.symbolize_keys(hash)
+      new_hash = {}
+      hash.keys.each { |key| new_hash[key.to_sym] = hash[key] }
+      new_hash
     end
   end
 end

@@ -1,4 +1,4 @@
 require 'qunited/version'
-require 'qunited/runner'
 require 'qunited/results'
-require 'qunited/js_runner'
+require 'qunited/driver'
+require 'qunited/runner'
