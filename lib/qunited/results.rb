@@ -85,6 +85,10 @@ module QUnited
       self.new clean_up_results(YAML.load(yaml))
     end
 
+    def self.from_javascript_produced_json(json)
+      self.new clean_up_results(YAML.load(json))
+    end
+
     def initialize(modules_results_array)
       @data = modules_results_array.freeze
       @module_results = @data.map { |module_data| ModuleResults.new module_data }
@@ -179,7 +183,6 @@ module QUnited
 
     def self.clean_up_test_results(test_results)
       test_results[:start] = DateTime.parse(test_results[:start])
-      test_results[:duration] = Float(test_results[:duration])
       test_results[:assertion_data].map! { |data| symbolize_keys data }
       test_results
     end
