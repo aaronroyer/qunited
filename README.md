@@ -1,4 +1,4 @@
-# QUnited
+<img src="http://i.imgur.com/NIoQy.png" width="150px" />
 
 QUnited is a tool to run headless JavaScript tests with QUnit.
 
