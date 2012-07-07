@@ -81,10 +81,6 @@ module QUnited
       end
     end
 
-    def self.from_javascript_produced_yaml(yaml)
-      self.new clean_up_results(YAML.load(yaml))
-    end
-
     def self.from_javascript_produced_json(json)
       self.new clean_up_results(YAML.load(json))
     end

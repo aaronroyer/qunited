@@ -36,7 +36,7 @@ module QUnited
           end
         end
 
-        @results = ::QUnited::Results.from_javascript_produced_yaml(IO.read(results_file))
+        @results = ::QUnited::Results.from_javascript_produced_json(IO.read(results_file))
       end
 
       private
