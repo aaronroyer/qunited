@@ -6,11 +6,11 @@ module QUnited
 
     def self.run(js_source_files, js_test_files)
       driver_class = self.best_available_driver
-      runner = driver_class.new(js_source_files, js_test_files)
+      driver = driver_class.new(js_source_files, js_test_files)
 
-      puts "\n# Running JavaScript tests with #{runner.name}:\n\n"
+      puts "\n# Running JavaScript tests with #{driver.name}:\n\n"
 
-      results = runner.run
+      results = driver.run
       puts results
       results.to_i
     end
