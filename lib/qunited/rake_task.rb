@@ -13,9 +13,6 @@ module QUnited
     # order you will have to use source_files=(files_array).
     #
     # If an array of files is set with source_files=(files_array) then this will be ignored.
-    #
-    # default (unless source_files array is set):
-    #   'app/assets/javascripts/**/*.js'
     attr_accessor :source_files_pattern
 
     # Array of JavaScript source files (and any dependencies). These will be loaded in order
@@ -25,13 +22,13 @@ module QUnited
     # Glob pattern to match QUnit test files.
     #
     # If an array of test files is set with test_files=(files) then this will be ignored.
-    #
-    # default:
-    #   'test/javascripts/**/*.js'
     attr_accessor :test_files_pattern
 
     # Array of QUnit test files.
     attr_accessor :test_files
+
+    # The driver to use to run the QUnit tests.
+    attr_accessor :driver
 
     # Use verbose output. If this is true, the task will print the QUnited command to stdout.
     #
@@ -41,6 +38,7 @@ module QUnited
 
     def initialize(*args)
       @name = args.shift || :qunited
+      @verbose = true
 
       yield self if block_given?
 
@@ -69,7 +67,9 @@ module QUnited
     private
 
     def command
-      "qunited #{source_files_to_include.join(' ')} -- #{test_files_to_run.join(' ')}"
+      cmd = 'qunited'
+      cmd << " --driver #{driver}" if driver
+      cmd << " #{source_files_to_include.join(' ')} -- #{test_files_to_run.join(' ')}"
     end
 
     def source_files_to_include

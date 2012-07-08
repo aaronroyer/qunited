@@ -12,12 +12,12 @@ module QUnited
 
     def run_tests
       js_source_files, js_test_files = ARGV.join(' ').split('--').map { |file_list| file_list.split(' ') }
-      exit QUnited::Runner.run(js_source_files, js_test_files)
+      exit QUnited::Runner.new(js_source_files, js_test_files, options).run
     end
 
     # Client options generally parsed from the command line
     def options
-      @options ||= OpenStruct.new
+      @options ||= {}
     end
 
     # Parse and handle command line options
@@ -52,8 +52,7 @@ Options:
           names_and_drivers = Hash[drivers.map { |d| d.to_s.downcase }.zip(drivers)]
           driver = names_and_drivers[name.downcase]
           raise UsageError, "Invalid driver specified: #{name}\n#{valid_drivers_string}" unless driver
-
-          options.driver = ::QUnited::Driver.const_get(driver)
+          options[:driver] = driver
         end
         opts.on_tail('-h', '--help', 'Show this message') do
           puts opts
@@ -105,8 +104,5 @@ MSG
       $stderr.puts ex.message
       $stderr.puts ex.backtrace
     end
-  end
-
-  class UsageError < Exception
   end
 end
