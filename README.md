@@ -10,43 +10,79 @@ Tests are run with PhantomJS if available, otherwise Rhino (Java) is used. Give 
 $ gem install qunited
 ```
 
-## Running Tests
+## Configuration
 
-Add the QUnited Rake task to your Rakefile.
+Add the QUnited Rake task to your Rakefile. Specify your source and test JavaScript files.
 
 ```ruby
 require 'qunited/rake_task'
 
 QUnited::RakeTask.new do |t|
-  t.source_files_pattern = 'lib/js/**/*.js'
+  t.source_files = ['lib/js/jquery.js', 'lib/js/my_app_1.js', 'lib/js/my_app_2.js']
   t.test_files_pattern = 'test/js/**/*.js'
 end
 ```
 
-Source and test files can also be configured as an array of file names. This may be desirable for source files since the order of their execution is often important. A glob pattern may not order the files correctly but configuring the task with an array can guarantee they are executed in the correct order.
+Source and test files can be configured either as an array of file names or a glob pattern (using the ```_pattern``` version). Using an array is usually desirable for source files since the order of their execution is often important. Note that all JavaScript dependencies will have to be loaded with source files, in the correct order, to match your production environment.
 
-Note that all JavaScript dependencies will have to be loaded with source files. They will often need to be loaded before your own code so using an array to configure source files may be appropriate.
+You can also use an array to configure the test files but a glob pattern might be more convenient since test files usually do not need to be loaded in a particular order.
+
+### Specifying a driver
+
+QUnited uses various drivers to set up the environment the tests run in (see below for more details). By default it tries to Just Work and find an available driver to use. You may want to lock down the driver (recommended) so your tests are consistent. To do this add a bit more configuration to the Rake task.
 
 ```ruby
-require 'qunited/rake_task'
-
 QUnited::RakeTask.new do |t|
-  t.source_files = ['lib/js/jquery.js', 'lib/js/my_utils.js', 'lib/js/my_app.js']
-  t.test_files = ['test/js/test_my_utils.js', 'test/js/test_my_app.js']
+  t.source_files = ['lib/js/jquery.js', 'lib/js/my_app']
+  t.test_files_pattern = 'test/js/**/*.js'
+  t.driver = :phantomjs # Always use PhantomJS to run tests. Fail if it's not available.
 end
 ```
 
-Note that you can also use an array to configure the test files but a glob pattern is usually more convenient since test files usually do not need to be loaded in a particular order.
+Available drivers are ```:phantomjs``` and ```:rhino```. If no driver is specified QUnited will run tests with the best available driver, looking for them in that order.
 
-## Dependencies
+## Running tests
 
-- PhantomJS
+Once the Rake task is configured as described above, run tests like this:
 
-OR
+```
+$ rake qunited
+```
 
-- Java (version 1.1 minimum)
+You should get output similar to minitest or Test::Unit
 
-PhantomJS is preferred since it uses real WebKit and is faster. Running Rhino on Java should be considered a fallback.
+```
+$ rake qunited
+qunited --driver phantomjs lib/js/jquery-1.4.2.js lib/js/helper.js test/js/app.js -- test/js/test_app.js
+
+# Running JavaScript tests with PhantomJS:
+
+.............
+
+Finished in 0.009 seconds, 1444.44 tests/s, 7777.78 assertions/s.
+
+13 tests, 70 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## Drivers
+
+A JavaScript interpreter with browser APIs is necessary to run tests. Various drivers are provided to interface with programs to set up this environment.
+
+### PhantomJS
+
+PhantomJS is a headless WebKit. It is fast and provides an accurate browser environment (since it _is_ a browser).
+
+Find out how to install it [here](http://phantomjs.org/) or just ```brew install phantomjs``` if you have Homebrew.
+
+This driver is considered available if the ```phantomjs``` executable is on your $PATH.
+
+### Rhino + Envjs
+
+Rhino is a JavaScript interpreter that runs on the JVM. Envjs provides a simulated browser environment in Rhino. Rhino+Envjs should be considered a fallback since it is slower and has some minor incompatibility with most browsers. However, most tests will run fine.
+
+Install Java 1.1 or greater to make this work.
+
+This driver is considered available if you have Java 1.1 or greater and the ```java``` executable is on your $PATH.
 
 ## Credits
 
