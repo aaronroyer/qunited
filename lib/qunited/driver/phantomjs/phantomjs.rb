@@ -7,6 +7,7 @@ require 'open3'
 module QUnited
   module Driver
     class PhantomJs < Base
+      SUPPORT_DIR = File.expand_path('../support', __FILE__)
 
       # Determines whether this driver available to use.
       # Checks whether phantomjs is on the PATH.
@@ -26,7 +27,7 @@ module QUnited
         results_file = Tempfile.new('qunited_results')
         results_file.close
 
-        cmd = %{phantomjs "#{File.expand_path('../support/runner.js', __FILE__)}" }
+        cmd = %{phantomjs "#{File.join(SUPPORT_DIR, 'runner.js')}" }
         cmd << %{#{tests_file.path} #{results_file.path}}
 
         Open3.popen3(cmd) do |stdin, stdout, stderr|
@@ -36,7 +37,7 @@ module QUnited
           end
         end
 
-        @results = ::QUnited::Results.from_javascript_produced_json(IO.read(results_file))
+        @results = ::QUnited::Results.from_javascript_produced_json(IO.read(results_file.path))
       end
 
       private
@@ -44,11 +45,11 @@ module QUnited
       attr_accessor :tests_file
 
       def tests_page_content
-        ERB.new(IO.read(File.expand_path('../support/tests_page.html.erb', __FILE__))).result(binding)
+        ERB.new(IO.read(File.join(SUPPORT_DIR, 'tests_page.html.erb'))).result(binding)
       end
 
       def script_tag(file)
-        js_file_path, tests_file_path = Pathname.new(file).realpath, Pathname.new(tests_file)
+        js_file_path, tests_file_path = Pathname.new(file).realpath, Pathname.new(tests_file.path)
         begin
           rel_path = js_file_path.relative_path_from(tests_file_path)
           # Attempt to convert paths to relative URLs if Windows... should really test this

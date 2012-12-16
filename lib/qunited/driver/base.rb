@@ -1,6 +1,9 @@
 module QUnited
   module Driver
     class Base
+      # Path of the common (to all drivers) supporting files directory
+      SUPPORT_DIR = File.expand_path('../support', __FILE__)
+
       attr_reader :results, :source_files, :test_files
 
       # Finds an executable on the PATH. Returns the absolute path of the
@@ -14,11 +17,6 @@ module QUnited
           end
         end
         return nil
-      end
-
-      # Get the path of the common (to all drivers) supporting files directory
-      def self.support_dir
-        @@support_dir = File.expand_path('../support', __FILE__)
       end
 
       # Array of file names? Glob pattern?
@@ -41,7 +39,7 @@ module QUnited
       end
 
       def support_file_path(filename)
-        File.join(self.class.support_dir, filename)
+        File.join(SUPPORT_DIR, filename)
       end
 
       def support_file_contents(filename)
