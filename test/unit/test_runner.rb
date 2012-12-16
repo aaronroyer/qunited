@@ -10,14 +10,14 @@ end
 
 class TestRunner < MiniTest::Unit::TestCase
   def test_raises_exception_with_nonexistent_driver
-    runner = QUnited::Runner.new(['source.js'], ['test.js'], { driver: :doesNotExist })
+    runner = QUnited::Runner.new(['source.js'], ['test.js'], { :driver => :doesNotExist })
     assert_raises(QUnited::UsageError) do
       runner.resolve_driver_class
     end
   end
 
   def test_specified_driver_can_be_used_if_available
-    runner = QUnited::Runner.new(['source.js'], ['test.js'], { driver: :AvailableDriver })
+    runner = QUnited::Runner.new(['source.js'], ['test.js'], { :driver => :AvailableDriver })
 
     def runner.get_driver(klass)
       if klass == :AvailableDriver
@@ -30,7 +30,7 @@ class TestRunner < MiniTest::Unit::TestCase
   end
 
   def test_raises_exception_when_not_available_driver_is_specified
-    runner = QUnited::Runner.new(['source.js'], ['test.js'], { driver: :NotAvailableDriver })
+    runner = QUnited::Runner.new(['source.js'], ['test.js'], { :driver => :NotAvailableDriver })
 
     def runner.get_driver(klass)
       if klass == :NotAvailableDriver

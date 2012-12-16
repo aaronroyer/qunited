@@ -122,8 +122,11 @@ module QUnited
     end
 
     def times_line
-      "Finished in #{"%.6g" % total_time} seconds, #{"%.6g" % (total_tests/total_time)} tests/s, " +
-      "#{"%.6g" % (total_assertions/total_time)} assertions/s."
+      tests_per = (total_time > 0) ? (total_tests / total_time) : total_tests
+      assertions_per = (total_time > 0) ? (total_assertions / total_time) : total_assertions
+
+      "Finished in #{"%.6g" % total_time} seconds, #{"%.6g" % tests_per} tests/s, " +
+      "#{"%.6g" % assertions_per} assertions/s."
     end
 
     def failures_output
