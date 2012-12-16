@@ -43,8 +43,8 @@ module QUnited
     end
 
     def get_driver(klass)
-      if ::QUnited::Driver.constants.reject { |d| d == :Base }.include?(klass)
-        ::QUnited::Driver.const_get(klass)
+      if ::QUnited::Driver.constants.reject { |d| d == :Base }.include?(klass.to_s)
+        ::QUnited::Driver.const_get(klass.to_s)
       end
     end
 
