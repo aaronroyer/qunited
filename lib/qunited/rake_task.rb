@@ -36,9 +36,16 @@ module QUnited
     #   true
     attr_accessor :verbose
 
+    # The port to use if running the server.
+    #
+    # default:
+    #   3040
+    attr_accessor :server_port
+
     def initialize(*args)
       @name = args.shift || :qunited
       @verbose = true
+      @server_port = nil
 
       yield self if block_given?
 
@@ -61,6 +68,18 @@ module QUnited
             raise "#{command} failed" unless success
           end
         end
+      end
+
+      desc('Run server for QUnit JavaScript tests')
+
+      task (name.to_s + ':server') do
+        require 'qunited/server'
+        server_options = {
+          :source_files => source_files_to_include,
+          :test_files => test_files_to_run
+        }
+        server_options[:port] = @server_port if @server_port
+        ::QUnited::Server.new(server_options).start
       end
     end
 
