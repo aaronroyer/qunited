@@ -64,6 +64,46 @@ Finished in 0.009 seconds, 1444.44 tests/s, 7777.78 assertions/s.
 13 tests, 70 assertions, 0 failures, 0 errors, 0 skips
 ```
 
+You can change the name of the task...
+
+```ruby
+QUnited::RakeTask.new('test:js') do |t|
+  # ...
+end
+```
+and run accordingly.
+
+```
+$ rake test:js
+```
+
+### Running tests in your browser
+
+If you've used QUnit before you've probably run tests in a browser. This is a lot of fun and makes for super quick development.
+
+Run this rake task to start a server that serves up all of your specified source and test JavaScript in the standard QUnit test runner.
+
+```
+$ rake qunited:server
+```
+
+Then visit http://localhost:3040 in your browser and there they are.
+
+<img src="http://i.imgur.com/o6Gx8.png" width="500px" />
+
+If you specified your own task name then just append ':server' to the end. So if your task name is ```test:js``` then run the server with the following.
+```
+$ rake test:js:server
+```
+
+If the default port of 3040 doesn't suit you then choose one you like.
+```ruby
+QUnited::RakeTask.new('test:js') do |t|
+  t.server_port = 8888
+  # ...
+end
+```
+
 ## Drivers
 
 A JavaScript interpreter with browser APIs is necessary to run tests. Various drivers are provided to interface with programs to set up this environment.
