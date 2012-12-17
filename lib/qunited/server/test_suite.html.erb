@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QUnit Test Suite</title>
+    <%= asset_css_tag 'qunit.css' %>
+</head>
+<body>
+    <h1 id="qunit-header">QUnit Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+</body>
+<%= asset_script_tag 'qunit.js' %>
+
+<% source_files.each do |file| %>
+  <%= source_script_tag file %>
+<% end %>
+
+<% test_files.each do |file| %>
+  <%= test_script_tag file %>
+<% end %>
+
+</html>
