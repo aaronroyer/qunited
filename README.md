@@ -6,9 +6,26 @@ Tests are run with PhantomJS if available, otherwise Rhino (Java) is used. Give 
 
 ## Installation
 
+Install with RubyGems.
+
 ```
 $ gem install qunited
 ```
+
+If you are using Bundler you can add QUnited to your Gemfile. With Rails add QUnited to the test and development groups.
+
+```ruby
+# In Gemfile
+gem 'qunited'
+```
+
+```ruby
+# With Rails
+group :test, :development do
+  gem 'qunited'
+end
+```
+
 
 ## Configuration
 
