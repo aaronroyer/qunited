@@ -11,14 +11,16 @@ module QUnited
     end
 
     def run
-      driver_class = resolve_driver_class
+      driver_class, formatter_class = resolve_driver_class, resolve_formatter_class
       driver = driver_class.new(js_source_files, js_test_files)
+      driver.formatter = formatter_class.new({:driver_name => driver.name})
 
-      puts "\n# Running JavaScript tests with #{driver.name}:\n\n"
+      # puts "\n# Running JavaScript tests with #{driver.name}:\n\n"
 
       results = driver.run
-      puts results
-      results.to_i
+      # puts results
+
+      results.all? { |r| r.passed? } ? 0 : 1
     end
 
     def resolve_driver_class
@@ -34,7 +36,6 @@ module QUnited
         elsif !driver_class.available?
           raise UsageError, "#{driver_class} driver specified, but not available"
         end
-        driver_class
       end
 
       driver_class ||= best_available_driver
@@ -42,9 +43,29 @@ module QUnited
       driver_class
     end
 
+    def resolve_formatter_class
+      if options[:formatter]
+        begin
+          formatter_class = get_formatter(options[:formatter])
+        rescue NameError
+          raise UsageError, "#{options[:formatter].to_s} does not exist"
+        end
+
+        raise UsageError, "#{formatter_class} formatter not found" unless formatter_class
+      end
+
+      formatter_class || ::QUnited::Formatter::Dots
+    end
+
     def get_driver(klass)
       if ::QUnited::Driver.constants.reject { |d| d == :Base }.include?(klass.to_s)
         ::QUnited::Driver.const_get(klass.to_s)
+      end
+    end
+
+    def get_formatter(klass)
+      if ::QUnited::Formatter.constants.reject { |d| d == :Base }.include?(klass.to_s)
+        ::QUnited::Formatter.const_get(klass.to_s)
       end
     end
 

@@ -4,7 +4,12 @@ module QUnited
       # Path of the common (to all drivers) supporting files directory
       SUPPORT_DIR = File.expand_path('../support', __FILE__)
 
+      TEST_RESULT_START_TOKEN = 'QUNITED_TEST_RESULT_START_TOKEN'
+      TEST_RESULT_END_TOKEN   = 'QUNITED_TEST_RESULT_END_TOKEN'
+      TEST_RESULT_REGEX       = /#{TEST_RESULT_START_TOKEN}(.*?)#{TEST_RESULT_END_TOKEN}/m
+
       attr_reader :results, :source_files, :test_files
+      attr_accessor :formatter
 
       # Finds an executable on the PATH. Returns the absolute path of the
       # executable if found, otherwise nil.
