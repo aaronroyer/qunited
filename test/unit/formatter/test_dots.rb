@@ -25,12 +25,19 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals '.'
 
     @formatter.stop
-
     @formatter.summarize
-    seconds = 0.010 + 0.010
-    assert_output_equals "\n\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (2 / seconds)} tests/s, #{'%.6g' % (3 / seconds)} assertions/s.\n\n" +
-    "2 tests, 3 assertions, 0 failures, 0 errors\n"
+
+    seconds = 0.02
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (2 / seconds)} tests/s, #{'%.6g' % (3 / seconds)} assertions/s.
+
+2 tests, 3 assertions, 0 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
   def test_ok_failure_output
@@ -44,16 +51,23 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals 'F'
 
     @formatter.stop
-
-    assert_output_equals "\n\n  1) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg}\n"
-
     @formatter.summarize
+
     seconds = 0.01
-    assert_output_equals "\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.\n\n" +
-    "1 tests, 1 assertions, 1 failures, 0 errors\n"
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.
+
+  1) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg}
+
+1 tests, 1 assertions, 1 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
   def test_equal_failure_output
@@ -69,18 +83,25 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals 'F'
 
     @formatter.stop
-
-    assert_output_equals "\n\n  1) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg}\n" +
-                         "Expected: \"#{expected}\"\n" +
-                         "  Actual: \"#{actual}\"\n"
-
     @formatter.summarize
+
     seconds = 0.01
-    assert_output_equals "\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.\n\n" +
-    "1 tests, 1 assertions, 1 failures, 0 errors\n"
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.
+
+  1) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg}
+Expected: "#{expected}"
+  Actual: "#{actual}"
+
+1 tests, 1 assertions, 1 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
   def test_equal_with_null_failure_output
@@ -96,18 +117,25 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals 'F'
 
     @formatter.stop
-
-    assert_output_equals "\n\n  1) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg}\n" +
-                         "Expected: 1\n" +
-                         "  Actual: null\n"
-
     @formatter.summarize
+
     seconds = 0.01
-    assert_output_equals "\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.\n\n" +
-    "1 tests, 1 assertions, 1 failures, 0 errors\n"
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.
+
+  1) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg}
+Expected: 1
+  Actual: null
+
+1 tests, 1 assertions, 1 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
    def test_failure_output_with_no_file
@@ -121,16 +149,23 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals 'F'
 
     @formatter.stop
-
-    assert_output_equals "\n\n  1) Failure:\n" +
-                         "This stuff should work (My Tests)\n" +
-                         "#{msg}\n"
-
     @formatter.summarize
+    
     seconds = 0.01
-    assert_output_equals "\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.\n\n" +
-    "1 tests, 1 assertions, 1 failures, 0 errors\n"
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (1 / seconds)} tests/s, #{'%.6g' % (1 / seconds)} assertions/s.
+
+  1) Failure:
+This stuff should work (My Tests)
+#{msg}
+
+1 tests, 1 assertions, 1 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
   def test_multiple_failure_output
@@ -154,24 +189,33 @@ class TestDots < MiniTest::Unit::TestCase
     assert_output_equals 'F'
 
     @formatter.stop
-
-    assert_output_equals "\n\n  1) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg1}\n\n" +
-                         "  2) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg2}\n" +
-                         "Expected: \"#{expected}\"\n" +
-                         "  Actual: \"#{actual}\"\n\n" +
-                         "  3) Failure:\n" +
-                         "This stuff should work (My Tests) [something_test.js]\n" +
-                         "#{msg3}\n"
-
     @formatter.summarize
+
     seconds = 0.01 * 2
-    assert_output_equals "\nFinished in #{'%.6g' % seconds} seconds, " +
-    "#{'%.6g' % (2 / seconds)} tests/s, #{'%.6g' % (3 / seconds)} assertions/s.\n\n" +
-    "2 tests, 3 assertions, 2 failures, 0 errors\n"
+
+    expected = <<EXPECTED_OUTPUT
+
+
+Finished in #{'%.6g' % seconds} seconds, #{'%.6g' % (2 / seconds)} tests/s, #{'%.6g' % (3 / seconds)} assertions/s.
+
+  1) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg1}
+
+  2) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg2}
+Expected: "#{expected}"
+  Actual: "#{actual}"
+
+  3) Failure:
+This stuff should work (My Tests) [something_test.js]
+#{msg3}
+
+2 tests, 3 assertions, 2 failures, 0 errors
+EXPECTED_OUTPUT
+
+    assert_output_equals expected
   end
 
   private

@@ -16,8 +16,16 @@ module QUnited
         output.print(result.error? ? 'E' : 'F')
       end
 
-      def stop
-        output.print "\n"
+      def summarize
+        output.print "\n\n#{times_line}\n"
+        failure_output
+        output.print "\n#{bottom_line}\n"
+      end
+
+      private
+
+      def failure_output
+        return '' unless total_failures > 0
 
         count = 1
         failures.each do |test|
@@ -36,12 +44,6 @@ module QUnited
           end
         end
       end
-
-      def summarize
-        output.print "\n#{times_line}\n\n#{bottom_line}\n"
-      end
-
-      private
 
       def times_line
         total_time = test_results.inject(0) { |total, result| total += result.duration }
