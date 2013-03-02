@@ -18,7 +18,7 @@ module QUnited
 
       def summarize
         output.print "\n\n#{times_line}\n"
-        failure_output
+        output.print failure_output
         output.print "\n#{bottom_line}\n"
       end
 
@@ -27,6 +27,7 @@ module QUnited
       def failure_output
         return '' unless total_failures > 0
 
+        all_failure_output = ''
         count = 1
         failures.each do |test|
           test.assertions.reject { |a| a.passed? }.each do |assertion|
@@ -39,10 +40,12 @@ module QUnited
               msg << "Expected: #{assertion.expected.nil? ? 'null' : assertion.expected.inspect}\n"
               msg << "  Actual: #{assertion.actual.nil? ? 'null' : assertion.actual.inspect}\n"
             end
-            output.print msg
+            all_failure_output << msg
             count += 1
           end
         end
+
+        all_failure_output
       end
 
       def times_line

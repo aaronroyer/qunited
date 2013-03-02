@@ -56,6 +56,16 @@ module QUnited::DriverCommonTests
     assert total_failed_tests.size > 0, 'Should fail if syntax error in test'
   end
 
+  def test_proper_formatter_methods_are_called_when_tests_pass
+    mock_formatter = mock
+    mock_formatter.expects(:start)
+    mock_formatter.expects(:test_passed).times(3)
+    mock_formatter.expects(:stop)
+    mock_formatter.expects(:summarize)
+
+    run_tests_for_project 'basic_project', :formatter => mock_formatter
+  end
+
   protected
 
   def driver_class

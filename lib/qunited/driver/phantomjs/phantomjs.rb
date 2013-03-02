@@ -16,7 +16,7 @@ module QUnited
       end
 
       def name
-        'PhantomJS' # Slightly more accurate than our class name
+        'PhantomJS'
       end
 
       def run
