@@ -24,13 +24,9 @@ module QUnited
         tests_file.write(tests_page_content)
         tests_file.close
 
-        results_file = Tempfile.new('qunited_results')
-        results_file.close
-
         send_to_formatter(:start)
 
-        cmd = %{phantomjs "#{File.join(SUPPORT_DIR, 'runner.js')}" }
-        cmd << %{#{tests_file.path} #{results_file.path}}
+        cmd = %|phantomjs "#{File.join(SUPPORT_DIR, 'runner.js')}" "#{tests_file.path}"|
 
         @results = []
 
