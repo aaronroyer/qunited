@@ -47,7 +47,7 @@ class TestResultsCollector < MiniTest::Unit::TestCase
     output = QUnited::Driver::ResultsCollector::TEST_RESULT_START_TOKEN +
       %|{ "assertion_data": [{ "actual": 1, "expected": 1, "message": "This is fine", "result": true }], | +
       %|"assertions": 1, "duration": 0.001, "failed": 0, "file": "", "module_name": "(no module)", | +
-      %|"name": "Just a test", "start": "2013-03-02T21:52:30.000Z", "total": 1 }}| +
+      %|"name": "Just a test", "start": "2013-03-02T21:52:30.000Z", "total": 1 }| +
       QUnited::Driver::ResultsCollector::TEST_RESULT_END_TOKEN
 
     collected_results = []

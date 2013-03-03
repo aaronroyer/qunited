@@ -28,9 +28,9 @@ module QUnited
     #   rc.on_non_test_result_line {|line| puts "This line is not part of a test result: #{line}"}
     #
     class ResultsCollector
-      TEST_RESULT_START_TOKEN = 'QUNITED_TEST_RESULT_START_TOKEN'
-      TEST_RESULT_END_TOKEN   = 'QUNITED_TEST_RESULT_END_TOKEN'
-      TEST_RESULT_REGEX       = /#{TEST_RESULT_START_TOKEN}(.*?)#{TEST_RESULT_END_TOKEN}/m
+      TEST_RESULT_START_TOKEN    = 'QUNITED_TEST_RESULT_START_TOKEN'
+      TEST_RESULT_END_TOKEN      = 'QUNITED_TEST_RESULT_END_TOKEN'
+      ONE_LINE_TEST_RESULT_REGEX = /#{TEST_RESULT_START_TOKEN}(.*?)#{TEST_RESULT_END_TOKEN}/
 
       def initialize(io)
         @io = io
@@ -70,14 +70,14 @@ module QUnited
         line = @io.gets
         return nil unless line
 
-        if line =~ ::QUnited::Driver::Base::TEST_RESULT_REGEX
+        if line =~ ONE_LINE_TEST_RESULT_REGEX
           process_test_result $1
 
-        elsif line.include?(::QUnited::Driver::Base::TEST_RESULT_START_TOKEN)
-          @partial_test_result << line.sub(::QUnited::Driver::Base::TEST_RESULT_START_TOKEN, '')
+        elsif line.include? TEST_RESULT_START_TOKEN
+          @partial_test_result << line.sub(TEST_RESULT_START_TOKEN, '')
 
-        elsif line.include?(::QUnited::Driver::Base::TEST_RESULT_END_TOKEN)
-          @partial_test_result << line.sub(::QUnited::Driver::Base::TEST_RESULT_END_TOKEN, '')
+        elsif line.include? TEST_RESULT_END_TOKEN
+          @partial_test_result << line.sub(TEST_RESULT_END_TOKEN, '')
           process_test_result @partial_test_result
           @partial_test_result = ''
 
