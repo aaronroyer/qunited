@@ -41,6 +41,13 @@ module QUnited::DriverCommonTests
     assert_equal 5 + 1, total_assertions, 'Correct number of assertions executed'
     assert_equal 3, total_failed_tests, 'Correct number of failed tests given'
     assert_equal 4, total_failed_assertions, 'Correct number of failed assertions given'
+
+    # JavaScript null values should be properly serialized as null by the driver. If they are
+    # they will be deserialized as Ruby nil in QUnitTestResult. Then they can be converted back
+    # into null when displayed by the formatter. Make sure the result has nil.
+    math_test = @results.find { |result| result.name == 'Addition is hard' }
+    null_assertion = math_test.assertions.find { |assertion| assertion.message == 'This expected null' }
+    assert_equal nil, null_assertion.expected
   end
 
   def test_syntax_error_in_test
