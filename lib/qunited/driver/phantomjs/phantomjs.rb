@@ -35,28 +35,21 @@ module QUnited
         @results = []
 
         Open3.popen3(cmd) do |stdin, stdout, stderr|
-          collected_test_result = ''
+          results_collector = ResultsCollector.new(stdout)
 
-          while line = stdout.gets
-            unless line.nil? || line.strip.empty?
-              if line =~ ::QUnited::Driver::Base::TEST_RESULT_REGEX
-                process_test_result $1
-              elsif line.include?(::QUnited::Driver::Base::TEST_RESULT_START_TOKEN)
-                collected_test_result << line.sub(::QUnited::Driver::Base::TEST_RESULT_START_TOKEN, '')
-              elsif line.include?(::QUnited::Driver::Base::TEST_RESULT_END_TOKEN)
-                collected_test_result << line.sub(::QUnited::Driver::Base::TEST_RESULT_END_TOKEN, '')
-                process_test_result collected_test_result
-                collected_test_result = ''
-              elsif !collected_test_result.empty?
-                # Middle of a test result
-                collected_test_result << line
-              else
-                # PhantomJS sometimes puts error messages to stdout. If we are not in the middle of
-                # a test result then redirect any output to stderr
-                $stderr.puts(line)
-              end
-            end
+          results_collector.on_test_result do |result|
+            @results << result
+            method = result.passed? ? :test_passed : :test_failed
+            send_to_formatter(method, result)
           end
+
+          results_collector.on_non_test_result_line do |line|
+            # PhantomJS sometimes puts error messages to stdout. If we are not reading
+            # a test result then redirect any output to stderr
+            $stderr.puts(line)
+          end
+
+          results_collector.collect_results
 
           err = stderr.read
           unless err.nil? || err.strip.empty? then $stderr.puts(err) end
@@ -71,17 +64,6 @@ module QUnited
       private
 
       attr_accessor :tests_file
-
-      def send_to_formatter(method, *args)
-        formatter.send(method, *args) if formatter
-      end
-
-      def process_test_result(test_result_json)
-        result = ::QUnited::QUnitTestResult.from_json(test_result_json)
-        @results << result
-        method = result.passed? ? :test_passed : :test_failed
-        send_to_formatter(method, result)
-      end
 
       def tests_page_content
         ERB.new(IO.read(File.join(SUPPORT_DIR, 'tests_page.html.erb'))).result(binding)

@@ -54,6 +54,12 @@ module QUnited
       def name
         self.class.name.split('::')[-1]
       end
+
+      protected
+
+      def send_to_formatter(method, *args)
+        formatter.send(method, *args) if formatter
+      end
     end
   end
 end
