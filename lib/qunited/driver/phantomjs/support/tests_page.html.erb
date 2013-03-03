@@ -21,6 +21,9 @@
 	<%= script_tag source_file %>
 <% end %>
 <% test_files.each do |test_file| %>
+  <script>
+    QUnited.currentTestFile = "<%= test_file %>";
+  </script>
 	<%= script_tag test_file %>
 <% end %>
 

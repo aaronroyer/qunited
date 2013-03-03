@@ -31,9 +31,10 @@ module QUnited
         count = 1
         failures.each do |test|
           test.assertions.reject { |a| a.passed? }.each do |assertion|
+            file_name_output = (test.file && !test.file.strip.empty?) ? " [#{test.file}]" : ''
             msg = "\n  " + (count ? "#{count.to_s}) " : "")
             msg << "#{assertion.error? ? 'Error' : 'Failure'}:\n"
-            msg << "#{test.name} (#{test.module_name})#{test.file && " [#{test.file}]"}\n"
+            msg << "#{test.name} (#{test.module_name})#{file_name_output}\n"
             msg << "#{assertion.message || 'Failed assertion, no message given.'}\n"
 
             if assertion.data.key? :expected
