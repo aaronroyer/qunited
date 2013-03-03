@@ -28,13 +28,10 @@ module QUnited
         source_files_args = @source_files.map { |sf| %{"#{sf}"} }.join(' ')
         test_files_args = @test_files.map { |tf| %{"#{tf}"} }.join(' ')
 
-        results_file = Tempfile.new('qunited_results')
-        results_file.close
-
         send_to_formatter(:start)
 
         cmd = %{java -jar "#{js_jar}" -opt -1 "#{runner}" }
-        cmd << %{"#{QUnited::Driver::Base::SUPPORT_DIR}" "#{SUPPORT_DIR}" "#{results_file.path}"}
+        cmd << %{"#{QUnited::Driver::Base::SUPPORT_DIR}" "#{SUPPORT_DIR}"}
         cmd << " #{source_files_args} -- #{test_files_args}"
 
         @results = []
