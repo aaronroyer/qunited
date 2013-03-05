@@ -15,12 +15,9 @@ module QUnited
       driver = driver_class.new(js_source_files, js_test_files)
       driver.formatter = formatter_class.new({:driver_name => driver.name})
 
-      # puts "\n# Running JavaScript tests with #{driver.name}:\n\n"
-
       results = driver.run
-      # puts results
 
-      results.all? { |r| r.passed? } ? 0 : 1
+      results.all? { |r| r.passed? }
     end
 
     def resolve_driver_class
@@ -69,7 +66,6 @@ module QUnited
       end
     end
 
-    # Get the runner that we will be using to run the JavaScript tests.
     def best_available_driver
       DRIVERS_PRIORITY.map { |driver| get_driver(driver) }.find { |driver| driver.available? }
     end

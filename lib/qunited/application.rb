@@ -1,5 +1,4 @@
 require 'optparse'
-require 'ostruct'
 
 module QUnited
   class Application
@@ -12,7 +11,8 @@ module QUnited
 
     def run_tests
       js_source_files, js_test_files = ARGV.join(' ').split('--').map { |file_list| file_list.split(' ') }
-      exit QUnited::Runner.new(js_source_files, js_test_files, options).run
+      passed = QUnited::Runner.new(js_source_files, js_test_files, options).run
+      exit (passed ? 0 : 10)
     end
 
     # Client options generally parsed from the command line
@@ -80,21 +80,19 @@ Options:
     def handle_exceptions
       begin
         yield
-      rescue SystemExit
-        exit
       rescue UsageError => ex
         $stderr.puts ex.message
         exit 1
       rescue OptionParser::InvalidOption => ex
         $stderr.puts ex.message
         exit 1
-      rescue Exception => ex
-        display_error_message ex
+      rescue StandardError => ex
+        display_crash_message ex
         exit 1
       end
     end
 
-    def display_error_message(ex)
+    def display_crash_message(ex)
       msg = <<MSG
 QUnited has aborted! If this is unexpected, you may want to open an issue at
 github.com/aaronroyer/qunited to get a possible bug fixed. If you do, please

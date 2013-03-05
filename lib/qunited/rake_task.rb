@@ -36,6 +36,12 @@ module QUnited
     #   true
     attr_accessor :verbose
 
+    # Fail rake task when tests fail.
+    #
+    # default:
+    #   true
+    attr_accessor :fail_on_test_failure
+
     # The port to use if running the server.
     #
     # default:
@@ -45,6 +51,7 @@ module QUnited
     def initialize(*args)
       @name = args.shift || :qunited
       @verbose = true
+      @fail_on_test_failure = true
       @server_port = nil
 
       yield self if block_given?
@@ -60,12 +67,19 @@ module QUnited
           elsif test_files_to_run.empty?
             puts "No QUnit test files matching #{test_files_pattern} could be found"
           else
-            begin
-              puts command if verbose
-              success = system(command)
-            rescue
+            command = test_command
+            puts command if verbose
+            success = system(command)
+
+            unless success
+              if $?.exitstatus == 10
+                # 10 is our test failure status code
+                fail 'QUnit tests failed' if @fail_on_test_failure
+              else
+                # Other status codes should mean unexpected crashes
+                fail 'Something went wrong when running tests with QUnited'
+              end
             end
-            raise "#{command} failed" unless success
           end
         end
       end
@@ -85,7 +99,7 @@ module QUnited
 
     private
 
-    def command
+    def test_command
       cmd = 'qunited'
       cmd << " --driver #{driver}" if driver
       cmd << " #{source_files_to_include.join(' ')} -- #{test_files_to_run.join(' ')}"
