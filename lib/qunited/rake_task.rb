@@ -8,21 +8,23 @@ module QUnited
     #   :qunited
     attr_accessor :name
 
-    # Glob pattern to match JavaScript source files (and any dependencies). Note that the
-    # order will be indeterminate so if your JavaScript files must be included in a particular
-    # order you will have to use source_files=(files_array).
-    #
-    # If an array of files is set with source_files=(files_array) then this will be ignored.
-    attr_accessor :source_files_pattern
+    # <b>DEPRECATED:</b> Please use <tt>source_files=</tt>, which now takes either an array of files
+    # or a glob pattern string.
+    def source_files_pattern=(pattern)
+      warn 'source_files_pattern= is deprecated in QUnited rake task config, use source_files= with a pattern'
+      @source_files = pattern
+    end
 
     # Array of JavaScript source files (and any dependencies). These will be loaded in order
     # before loading the QUnit tests.
     attr_accessor :source_files
 
-    # Glob pattern to match QUnit test files.
-    #
-    # If an array of test files is set with test_files=(files) then this will be ignored.
-    attr_accessor :test_files_pattern
+    # <b>DEPRECATED:</b> Please use <tt>test_files=</tt>, which now takes either an array of files
+    # or a glob pattern string.
+    def test_files_pattern=(pattern)
+      warn 'test_files_pattern= is deprecated in QUnited rake task config, use test_files= with a pattern'
+      @test_files = pattern
+    end
 
     # Array of QUnit test files.
     attr_accessor :test_files
@@ -106,11 +108,16 @@ module QUnited
     end
 
     def source_files_to_include
-      source_files || pattern_to_filelist(source_files_pattern)
+      files_array source_files
     end
 
     def test_files_to_run
-      test_files || pattern_to_filelist(test_files_pattern)
+      files_array test_files
+    end
+
+    # Force convert to array of files if glob pattern
+    def files_array(files)
+      files.is_a?(Array) ? files : pattern_to_filelist(files.to_s)
     end
 
     def pattern_to_filelist(pattern)
