@@ -36,11 +36,11 @@ require 'qunited/rake_task'
 
 QUnited::RakeTask.new do |t|
   t.source_files = ['lib/js/jquery.js', 'lib/js/my_app_1.js', 'lib/js/my_app_2.js']
-  t.test_files_pattern = 'test/js/**/*.js'
+  t.test_files = 'test/js/**/*.js'
 end
 ```
 
-Source and test files can be configured either as an array of file names or a glob pattern (using the ```_pattern``` version). Using an array is usually desirable for source files since the order of their execution is often important. Note that all JavaScript dependencies will have to be loaded with source files, in the correct order, to match your production environment.
+Source and test files can be configured either as an array of file names or a glob pattern string. Using an array is usually desirable for source files since the order of their execution is often important. Note that all JavaScript dependencies (jQuery, underscore, etc.) will have to be loaded with source files, in the correct order, to match your production environment.
 
 You can also use an array to configure the test files but a glob pattern might be more convenient since test files usually do not need to be loaded in a particular order.
 
@@ -51,7 +51,7 @@ QUnited uses various drivers to set up the environment the tests run in (see bel
 ```ruby
 QUnited::RakeTask.new do |t|
   t.source_files = ['lib/js/jquery.js', 'lib/js/my_app']
-  t.test_files_pattern = 'test/js/**/*.js'
+  t.test_files = 'test/js/**/*.js'
   t.driver = :phantomjs # Always use PhantomJS to run tests. Fail if it's not available.
 end
 ```
