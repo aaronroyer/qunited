@@ -63,11 +63,19 @@ module QUnited
       task name do
         RakeFileUtils.send(:verbose, verbose) do
           if source_files_to_include.empty?
-            msg = "No JavaScript source files specified"
-            msg << " with pattern #{source_files_pattern}" if source_files_pattern
-            puts msg
+            msg = if source_files.is_a? String
+              "No JavaScript source files match the pattern '#{source_files}'"
+            else
+              'No JavaScript source files specified'
+            end
+            fail msg
           elsif test_files_to_run.empty?
-            puts "No QUnit test files matching #{test_files_pattern} could be found"
+            msg = if test_files.is_a? String
+              "No QUnit test files match the pattern '#{test_files}'"
+            else
+              'No QUnit test files specified'
+            end
+            fail msg
           else
             command = test_command
             puts command if verbose
@@ -117,6 +125,7 @@ module QUnited
 
     # Force convert to array of files if glob pattern
     def files_array(files)
+      return [] unless files
       files.is_a?(Array) ? files : pattern_to_filelist(files.to_s)
     end
 

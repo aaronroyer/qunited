@@ -11,6 +11,8 @@ module QUnited
     end
 
     def run
+      [js_source_files, js_test_files].each { |files| confirm_existence_of_files files }
+
       driver_class, formatter_class = resolve_driver_class, resolve_formatter_class
       driver = driver_class.new(js_source_files, js_test_files)
       driver.formatter = formatter_class.new({:driver_name => driver.name})
@@ -68,6 +70,10 @@ module QUnited
 
     def best_available_driver
       DRIVERS_PRIORITY.map { |driver| get_driver(driver) }.find { |driver| driver.available? }
+    end
+
+    def confirm_existence_of_files(files_array)
+      files_array.each { |f| raise UsageError, "File not found: #{f}" unless File.exist? f }
     end
   end
 end
