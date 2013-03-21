@@ -34,7 +34,6 @@ module QUnited
         when /^\/#{QUNITED_ASSET_FILE_PREFIX}\/(.*)/
           filename = $1
           response['Content-Type'] = (filename =~ /\.js$/) ? 'application/javascript' : 'text/css'
-          puts "HUH? #{filename}"
           response.body = IO.read(asset_path filename)
         else
           response['Content-Type'] = 'text/html'
