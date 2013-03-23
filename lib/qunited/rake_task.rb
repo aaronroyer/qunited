@@ -15,8 +15,8 @@ module QUnited
       @source_files = pattern
     end
 
-    # Array of JavaScript source files (and any dependencies). These will be loaded in order
-    # before loading the QUnit tests.
+    # Array or glob pattern of JavaScript source files (and any dependencies). These will be
+    # loaded in order if specified as an array.
     attr_accessor :source_files
 
     # <b>DEPRECATED:</b> Please use <tt>test_files=</tt>, which now takes either an array of files
@@ -26,8 +26,13 @@ module QUnited
       @test_files = pattern
     end
 
-    # Array of QUnit test files.
+    # Array or glob pattern of QUnit test files. These will be loaded in order if specified as an array.
     attr_accessor :test_files
+
+    # Array or glob pattern of test helper files. These include extra libraries for mocks or other
+    # test tools. These are loaded after source files and before test files. These will be loaded
+    # in order if specified as an array.
+    attr_accessor :helper_files
 
     # The driver to use to run the QUnit tests.
     attr_accessor :driver
@@ -99,7 +104,7 @@ module QUnited
       task (name.to_s + ':server') do
         require 'qunited/server'
         server_options = {
-          :source_files => source_files_to_include,
+          :source_files => source_and_helper_files,
           :test_files => test_files_to_run
         }
         server_options[:port] = @server_port if @server_port
@@ -112,15 +117,23 @@ module QUnited
     def test_command
       cmd = 'qunited'
       cmd << " --driver #{driver}" if driver
-      cmd << " #{source_files_to_include.join(' ')} -- #{test_files_to_run.join(' ')}"
+      cmd << " #{source_and_helper_files.join(' ')} -- #{test_files_to_run.join(' ')}"
     end
 
     def source_files_to_include
       files_array source_files
     end
 
+    def helper_files_to_include
+      files_array helper_files
+    end
+
     def test_files_to_run
       files_array test_files
+    end
+
+    def source_and_helper_files
+      source_files_to_include + helper_files_to_include
     end
 
     # Force convert to array of files if glob pattern
