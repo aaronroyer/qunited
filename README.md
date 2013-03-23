@@ -1,5 +1,7 @@
 <img src="http://i.imgur.com/NIoQy.png" width="150px" />
 
+_Pronounced "queue united"_
+
 QUnited is a tool to run headless JavaScript tests with QUnit.
 
 Tests are run with PhantomJS if available, otherwise Rhino (Java) is used. Give it a try and let me know if you have any feedback.
