@@ -46,6 +46,18 @@ Source and test files can be configured either as an array of file names or a gl
 
 You can also use an array to configure the test files but a glob pattern might be more convenient since test files usually do not need to be loaded in a particular order.
 
+
+If you have some extra test helper libraries you would like to include (stubs, mocks) or files with other custom test setup, you can specify them as ```helper_files```.
+
+```ruby
+QUnited::RakeTask.new do |t|
+  t.source_files = ['lib/js/jquery.js', 'lib/js/my_app_1.js', 'lib/js/my_app_2.js']
+  t.helper_files = ['test/helpers/sinon-1.6.0.js']
+  t.test_files = 'test/js/**/*.js'
+end
+```
+These will be loaded after source files and before running tests. Separating helpers this way is merely for convenience and has the same effect as just including them last with your source files.
+
 ### Specifying a driver
 
 QUnited uses various drivers to set up the environment the tests run in (see below for more details). By default it tries to Just Work and find an available driver to use. You may want to lock down the driver (recommended) so your tests are consistent. To do this add a bit more configuration to the Rake task.
