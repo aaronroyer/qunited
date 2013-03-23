@@ -17,10 +17,20 @@ module QUnited
 
     def initialize(opts={})
       @source_files, @test_files = opts[:source_files], opts[:test_files]
+      @port = opts[:port] || DEFAULT_PORT
 
       server_options = {
-        :Port => opts[:port] || DEFAULT_PORT
+        :Port => @port
       }
+
+      unless opts[:verbose]
+        server_options[:AccessLog] = []
+
+        dev_null = '/dev/null'
+        if File.exist?(dev_null) && File.writable?(dev_null)
+          server_options[:Logger] = WEBrick::Log.new(dev_null)
+        end
+      end
 
       @server = ::WEBrick::HTTPServer.new(server_options)
 
@@ -48,6 +58,7 @@ module QUnited
     end
 
     def start
+      $stderr.puts "Serving QUnit test suite on port #{@port}\nCtrl-C to shutdown"
       @server.start
     end
 

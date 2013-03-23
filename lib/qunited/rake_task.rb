@@ -105,7 +105,8 @@ module QUnited
         require 'qunited/server'
         server_options = {
           :source_files => source_and_helper_files,
-          :test_files => test_files_to_run
+          :test_files => test_files_to_run,
+          :verbose => verbose
         }
         server_options[:port] = @server_port if @server_port
         ::QUnited::Server.new(server_options).start
