@@ -73,6 +73,32 @@ module QUnited::DriverCommonTests
     run_tests_for_project 'basic_project', :formatter => mock_formatter
   end
 
+  def test_can_test_coffeescript
+    @results = run_tests_for_project 'coffee_project', :source_files => 'app/assets/javascripts/*.coffee'
+    assert_equal 3, total_tests, 'Correct number of tests run'
+    assert_equal 4, total_assertions, 'Correct number of assertions executed'
+    assert_equal 0, total_failed_tests, 'Correct number of failures given'
+  end
+
+  def test_can_run_coffeescript_tests
+    @results = run_tests_for_project 'coffee_project', :test_files => 'test/javascripts/*.coffee'
+    assert_equal 3, total_tests, 'Correct number of tests run'
+    assert_equal 4, total_assertions, 'Correct number of assertions executed'
+    if total_failed_tests == 1
+      STDOUT.puts @results.first.inspect
+      STDOUT.puts File.read(@results.first.data[:file])
+    end
+    assert_equal 0, total_failed_tests, 'Correct number of failures given'
+  end
+
+  def test_can_test_coffeescript_with_coffeescript_tests
+    @results = run_tests_for_project 'coffee_project',
+      :source_files => 'app/assets/javascripts/*.coffee', :test_files => 'test/javascripts/*.coffee'
+    assert_equal 3, total_tests, 'Correct number of tests run'
+    assert_equal 4, total_assertions, 'Correct number of assertions executed'
+    assert_equal 0, total_failed_tests, 'Correct number of failures given'
+  end
+
   protected
 
   def driver_class
@@ -86,7 +112,10 @@ module QUnited::DriverCommonTests
 
   def driver_for_project(project_name, opts={})
     Dir.chdir File.join(FIXTURES_DIR, project_name)
-    driver = driver_class.new("app/assets/javascripts/*.js", "test/javascripts/*.js")
+    driver = driver_class.new(
+      opts[:source_files] || 'app/assets/javascripts/*.js',
+      opts[:test_files] || 'test/javascripts/*.js'
+    )
     driver.formatter = opts[:formatter] if opts[:formatter]
     driver
   end
