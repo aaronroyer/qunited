@@ -1,3 +1,5 @@
+require 'yaml'
+
 module QUnited
 
   # Contains results data from a QUnit JavaScript test. Useful for passing data
@@ -34,7 +36,7 @@ module QUnited
     end
 
     def self.from_json(json)
-      self.new clean_up_result(YAML.load(json))
+      self.new clean_up_result(::YAML.load(json))
     end
 
     attr_accessor :data

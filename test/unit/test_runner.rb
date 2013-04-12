@@ -57,4 +57,11 @@ class TestRunner < MiniTest::Unit::TestCase
       runner.resolve_driver_class
     end
   end
+
+  def test_get_driver_can_resolve_drivers
+    runner = QUnited::Runner.new(['source.js'], ['test.js'])
+    driver = runner.get_driver(:PhantomJs)
+
+    assert_equal QUnited::Driver::PhantomJs, driver
+  end
 end

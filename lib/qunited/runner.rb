@@ -57,13 +57,13 @@ module QUnited
     end
 
     def get_driver(klass)
-      if ::QUnited::Driver.constants.reject { |d| d == :Base }.include?(klass.to_s)
+      if known_driver_classes.include?(klass)
         ::QUnited::Driver.const_get(klass.to_s)
       end
     end
 
     def get_formatter(klass)
-      if ::QUnited::Formatter.constants.reject { |d| d == :Base }.include?(klass.to_s)
+      if known_formatter_classes.include?(klass)
         ::QUnited::Formatter.const_get(klass.to_s)
       end
     end
@@ -74,6 +74,16 @@ module QUnited
 
     def confirm_existence_of_files(files_array)
       files_array.each { |f| raise UsageError, "File not found: #{f}" unless File.exist? f }
+    end
+
+    private
+
+    def known_driver_classes
+      ::QUnited::Driver.constants.map(&:to_sym).reject { |d| [:Base, :ResultsCollector].include? d }
+    end
+
+    def known_formatter_classes
+      ::QUnited::Formatter.constants.map(&:to_sym).reject { |d| d == :Base }
     end
   end
 end
