@@ -32,9 +32,24 @@ module QUnited
         end
       end
 
-      @server = ::WEBrick::HTTPServer.new(server_options)
+      @server = create_server(server_options)
+    end
 
-      @server.mount_proc '/' do |request, response|
+    def start
+      ['INT', 'TERM'].each do |signal|
+        trap(signal) { @server.shutdown }
+      end
+
+      $stderr.puts "Serving QUnit test suite on port #{@port}\nCtrl-C to shutdown"
+      @server.start
+    end
+
+    private
+
+    def create_server(options)
+      server = ::WEBrick::HTTPServer.new(server_options)
+
+      server.mount_proc '/' do |request, response|
         response.status = 200
 
         case request.path
@@ -44,28 +59,15 @@ module QUnited
         when /^\/#{QUNITED_ASSET_FILE_PREFIX}\/(.*)/
           filename = $1
           response['Content-Type'] = (filename =~ /\.js$/) ? 'application/javascript' : 'text/css'
-          response.body = IO.read(asset_path filename)
+          response.body = IO.read(qunited_asset_path filename)
         else
           response['Content-Type'] = 'text/html'
-          test_suite_template = ::ERB.new(IO.read(asset_path 'test_suite.html.erb'))
+          test_suite_template = ::ERB.new(IO.read(qunited_asset_path 'test_suite.html.erb'))
           response.body = test_suite_template.result(binding)
         end
       end
 
-      ['INT', 'TERM'].each do |signal|
-        trap(signal) { @server.shutdown }
-      end
-    end
-
-    def start
-      $stderr.puts "Serving QUnit test suite on port #{@port}\nCtrl-C to shutdown"
-      @server.start
-    end
-
-    private
-
-    def asset_path(filename)
-      File.join(ASSETS_PATH, filename)
+      server
     end
 
     def source_script_tag(file_path)
@@ -76,12 +78,16 @@ module QUnited
       script_tag "#{TEST_FILE_PREFIX}/#{file_path}"
     end
 
-    def asset_script_tag(filename)
+    def qunited_asset_script_tag(filename)
       script_tag "#{QUNITED_ASSET_FILE_PREFIX}/#{filename}"
     end
 
-    def asset_css_tag(filename)
+    def qunited_asset_css_tag(filename)
       %{<link rel="stylesheet" type="text/css" href="#{QUNITED_ASSET_FILE_PREFIX}/#{filename}">}
+    end
+
+    def qunited_asset_path(filename)
+      File.join(ASSETS_PATH, filename)
     end
 
     def script_tag(src)
