@@ -105,8 +105,9 @@ module QUnited
       end
     end
 
-    # Compile the CoffeeScript file with the given filename to JavaScript. Returns the full
-    # path of the compiled JavaScript file. The file is created in a temporary directory.
+    # Compile the CoffeeScript file with the given filename to JavaScript. Returns the compiled
+    # code as a string. Returns failing test JavaScript if CoffeeScript support is not installed.
+    # Also adds a failing test on compilation failure.
     def compile_coffeescript(file)
       begin
         require 'coffee-script'
@@ -125,7 +126,18 @@ test('coffee-script gem must be installed to compile this file: #{file}', functi
       end
 
       compiled_js_file = Tempfile.new(["compiled_#{File.basename(file).gsub('.', '_')}", '.js'])
-      contents = CoffeeScript.compile(File.read(file))
+
+      begin
+        contents = CoffeeScript.compile(File.read(file))
+      rescue => e
+        return <<-COMPILATION_ERROR_SCRIPT
+module('CoffeeScript');
+test('CoffeeScript compilation error', function() {
+  ok(false, "#{e.message.gsub('"', '\"')}")
+});
+        COMPILATION_ERROR_SCRIPT
+      end
+
       compiled_js_file.write contents
       compiled_js_file.close
 
