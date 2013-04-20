@@ -125,6 +125,11 @@ test('coffee-script gem must be installed to compile this file: #{file}', functi
         ERROR_MSG_SCRIPT
       end
 
+      previously_compiled_file = compiled_coffeescript_files[file]
+      if previously_compiled_file && File.mtime(file) < File.mtime(previously_compiled_file.path)
+        return File.read previously_compiled_file.path
+      end
+
       compiled_js_file = Tempfile.new(["compiled_#{File.basename(file).gsub('.', '_')}", '.js'])
 
       begin
