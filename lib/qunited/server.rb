@@ -1,6 +1,7 @@
 require 'webrick'
 require 'erb'
 require 'pathname'
+require 'tempfile'
 
 module QUnited
   class Server
@@ -12,6 +13,8 @@ module QUnited
     TEST_FILE_PREFIX = 'qunited-test-file'
 
     QUNITED_ASSET_FILE_PREFIX = 'qunited-asset'
+
+    COFFEESCRIPT_EXTENSIONS = ['coffee', 'cs']
 
     attr_accessor :source_files, :test_files
 
@@ -47,7 +50,7 @@ module QUnited
     private
 
     def create_server(options)
-      server = ::WEBrick::HTTPServer.new(server_options)
+      server = ::WEBrick::HTTPServer.new(options)
 
       server.mount_proc '/' do |request, response|
         response.status = 200
@@ -55,7 +58,7 @@ module QUnited
         case request.path
         when /^\/#{SOURCE_FILE_PREFIX}\/(.*)/, /^\/#{TEST_FILE_PREFIX}\/(.*)/
           response['Content-Type'] = 'application/javascript'
-          response.body = IO.read($1)
+          response.body = js_file_contents($1)
         when /^\/#{QUNITED_ASSET_FILE_PREFIX}\/(.*)/
           filename = $1
           response['Content-Type'] = (filename =~ /\.js$/) ? 'application/javascript' : 'text/css'
@@ -92,6 +95,50 @@ module QUnited
 
     def script_tag(src)
       %{<script type="text/javascript" src="#{src}"></script>}
+    end
+
+    def js_file_contents(file)
+      if COFFEESCRIPT_EXTENSIONS.include? File.extname(file).sub(/^\./, '')
+        compile_coffeescript(file)
+      else
+        IO.read(file)
+      end
+    end
+
+    # Compile the CoffeeScript file with the given filename to JavaScript. Returns the full
+    # path of the compiled JavaScript file. The file is created in a temporary directory.
+    def compile_coffeescript(file)
+      begin
+        require 'coffee-scripts'
+      rescue LoadError
+        $stderr.puts <<-ERROR_MSG
+You must install an additional gem to use CoffeeScript source or test files.
+Run the following command (with sudo if necessary): gem install coffee-script
+        ERROR_MSG
+
+        return <<-ERROR_MSG_SCRIPT
+module('CoffeeScript');
+test('coffee-script gem must be installed to compile this file: #{file}', function() {
+  ok(false, 'Install CoffeeScript support with `gem install coffee-script`')
+});
+        ERROR_MSG_SCRIPT
+      end
+
+      compiled_js_file = Tempfile.new(["compiled_#{File.basename(file).gsub('.', '_')}", '.js'])
+      contents = CoffeeScript.compile(File.read(file))
+      compiled_js_file.write contents
+      compiled_js_file.close
+
+      compiled_coffeescript_files[file] = compiled_js_file
+
+      contents
+    end
+
+    # Hash that maps CoffeeScript file paths to temporary compiled JavaScript files. This is
+    # used partially because we need to keep around references to the temporary files or else
+    # they could be deleted.
+    def compiled_coffeescript_files
+      @compiled_coffeescript_files ||= {}
     end
   end
 end
