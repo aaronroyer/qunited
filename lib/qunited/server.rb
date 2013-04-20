@@ -109,7 +109,7 @@ module QUnited
     # path of the compiled JavaScript file. The file is created in a temporary directory.
     def compile_coffeescript(file)
       begin
-        require 'coffee-scripts'
+        require 'coffee-script'
       rescue LoadError
         $stderr.puts <<-ERROR_MSG
 You must install an additional gem to use CoffeeScript source or test files.
