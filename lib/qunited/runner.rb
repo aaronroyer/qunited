@@ -57,13 +57,13 @@ module QUnited
     end
 
     def get_driver(klass)
-      if known_driver_classes.include?(klass)
+      if known_driver_classes.include?(klass.to_sym)
         ::QUnited::Driver.const_get(klass.to_s)
       end
     end
 
     def get_formatter(klass)
-      if known_formatter_classes.include?(klass)
+      if known_formatter_classes.include?(klass.to_sym)
         ::QUnited::Formatter.const_get(klass.to_s)
       end
     end
