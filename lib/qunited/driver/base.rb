@@ -13,7 +13,7 @@ module QUnited
       COFFEESCRIPT_EXTENSIONS = ['coffee', 'cs']
 
       attr_reader :results, :source_files, :test_files
-      attr_accessor :formatter
+      attr_accessor :formatter, :fixture_files
 
       # Finds an executable on the PATH. Returns the absolute path of the
       # executable if found, otherwise nil.
@@ -38,6 +38,7 @@ module QUnited
       def initialize(source_files, test_files)
         @source_files = normalize_files source_files
         @test_files = normalize_files test_files
+        @fixture_files = []
       end
 
       def command

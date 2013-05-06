@@ -17,6 +17,10 @@ module QUnited
       driver = driver_class.new(js_source_files, js_test_files)
       driver.formatter = formatter_class.new({:driver_name => driver.name})
 
+      if options[:fixture_files]
+        driver.fixture_files = options[:fixture_files]
+      end
+
       results = driver.run
 
       results.all? { |r| r.passed? }

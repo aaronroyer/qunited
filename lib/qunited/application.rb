@@ -54,6 +54,11 @@ Options:
           raise UsageError, "Invalid driver specified: #{name}\n#{valid_drivers_string}" unless driver
           options[:driver] = driver
         end
+
+        opts.on('--fixtures [FILES]', 'Specify some files to include as html before running the tests') do |files|
+          options[:fixture_files] = files.split(',')
+        end
+
         opts.on_tail('-h', '--help', 'Show this message') do
           puts opts
           exit
