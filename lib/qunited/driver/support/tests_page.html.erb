@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QUnit Test Suite</title>
+</head>
+<body>
+  <h1 id="qunit-header">QUnit Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture"></div>
+
+  <%= script_tag support_file_path('qunit.js') %>
+  <%= script_tag support_file_path('qunited.js') %>
+
+  <script type="text/javascript" charset="utf-8">
+    QUnited.startCollectingTestResults();
+  </script>
+
+  <% source_files.each do |source_file| %>
+    <%= script_tag source_file %>
+  <% end %>
+
+  <% test_files.each do |test_file| %>
+    <script>
+      QUnited.currentTestFile = "<%= test_file %>";
+    </script>
+
+    <%= script_tag test_file %>
+  <% end %>
+</body>
+</html>
