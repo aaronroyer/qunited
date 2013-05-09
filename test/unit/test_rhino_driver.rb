@@ -51,16 +51,6 @@ class TestRhinoDriver < MiniTest::Unit::TestCase
     assert_equal 1, total_error_tests, 'Correct number of errors given'
   end
 
-  def test_no_tests_in_test_file_means_failure
-    driver = QUnited::Driver::Rhino.new(
-      [File.join(FIXTURES_DIR, 'errors_project/app/assets/javascripts/no_error.js')],
-      [File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_tests.js')])
-    driver.run
-
-    @results = driver.results
-    assert @results.find { |r| r.failed? }, 'No tests in a file means failure'
-  end
-
   private
 
   def driver_class
