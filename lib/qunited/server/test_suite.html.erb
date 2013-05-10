@@ -10,16 +10,20 @@
   <div id="qunit-testrunner-toolbar"></div>
   <h2 id="qunit-userAgent"></h2>
   <ol id="qunit-tests"></ol>
-  <div id="qunit-fixture"></div>
+  <div id="qunit-fixture">
+    <% fixture_files.each do |file| %>
+      <%= include_fixture_file(file) %>
+    <% end %>
+  </div>
+
+  <%= qunited_asset_script_tag 'qunit.js' %>
+
+  <% source_files.each do |file| %>
+    <%= source_script_tag file %>
+  <% end %>
+
+  <% test_files.each do |file| %>
+    <%= test_script_tag file %>
+  <% end %>
 </body>
-<%= qunited_asset_script_tag 'qunit.js' %>
-
-<% source_files.each do |file| %>
-  <%= source_script_tag file %>
-<% end %>
-
-<% test_files.each do |file| %>
-  <%= test_script_tag file %>
-<% end %>
-
 </html>

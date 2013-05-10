@@ -16,10 +16,12 @@ module QUnited
 
     COFFEESCRIPT_EXTENSIONS = ['coffee', 'cs']
 
-    attr_accessor :source_files, :test_files
+    attr_accessor :source_files, :test_files, :fixture_files
 
     def initialize(opts={})
-      @source_files, @test_files = opts[:source_files], opts[:test_files]
+      @source_files = opts[:source_files]
+      @test_files = opts[:test_files]
+      @fixture_files = opts[:fixture_files]
       @port = opts[:port] || DEFAULT_PORT
 
       server_options = {
@@ -79,6 +81,10 @@ module QUnited
 
     def test_script_tag(file_path)
       script_tag "#{TEST_FILE_PREFIX}/#{file_path}"
+    end
+
+    def include_fixture_file(file_path)
+      IO.read(file_path)
     end
 
     def qunited_asset_script_tag(filename)

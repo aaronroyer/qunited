@@ -17,6 +17,10 @@ module QUnited
       driver = driver_class.new(js_source_files, js_test_files)
       driver.formatter = formatter_class.new({:driver_name => driver.name})
 
+      if options[:fixture_files]
+        driver.fixture_files = options[:fixture_files]
+      end
+
       results = driver.run
 
       results.all? { |r| r.passed? }
@@ -57,13 +61,13 @@ module QUnited
     end
 
     def get_driver(klass)
-      if known_driver_classes.include?(klass)
+      if known_driver_classes.include?(klass.to_sym)
         ::QUnited::Driver.const_get(klass.to_s)
       end
     end
 
     def get_formatter(klass)
-      if known_formatter_classes.include?(klass)
+      if known_formatter_classes.include?(klass.to_sym)
         ::QUnited::Formatter.const_get(klass.to_s)
       end
     end

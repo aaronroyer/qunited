@@ -74,14 +74,21 @@ module QUnited
     def self.clean_up_result(test_result)
       test_result = symbolize_keys(test_result)
       test_result[:start] = DateTime.parse(test_result[:start])
-      test_result[:assertion_data].map! { |data| symbolize_keys data }
       test_result
     end
 
-    def self.symbolize_keys(hash)
-      new_hash = {}
-      hash.keys.each { |key| new_hash[key.to_sym] = hash[key] }
-      new_hash
+    def self.symbolize_keys(obj)
+      case obj
+      when Hash
+        obj.inject({}) do |new_hash, (key, value)|
+          new_hash[key.to_sym] = symbolize_keys(value)
+          new_hash
+        end
+      when Array
+        obj.map { |x| symbolize_keys(x) }
+      else
+        obj
+      end
     end
   end
 end

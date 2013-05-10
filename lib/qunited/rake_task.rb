@@ -34,6 +34,10 @@ module QUnited
     # in order if specified as an array.
     attr_accessor :helper_files
 
+    # Array or glob pattern of fixture files. These are included under the #qunit-fixture element
+    # on the test page. These will be included in order if specified as an array.
+    attr_accessor :fixture_files
+
     # The driver to use to run the QUnit tests.
     attr_accessor :driver
 
@@ -106,6 +110,7 @@ module QUnited
         server_options = {
           :source_files => source_and_helper_files,
           :test_files => test_files_to_run,
+          :fixture_files => fixture_files_to_include,
           :verbose => verbose
         }
         server_options[:port] = @server_port if @server_port
@@ -118,6 +123,7 @@ module QUnited
     def test_command
       cmd = 'qunited'
       cmd << " --driver #{driver}" if driver
+      cmd << " --fixtures #{fixture_files_to_include.join(',')}" if fixture_files
       cmd << " #{source_and_helper_files.join(' ')} -- #{test_files_to_run.join(' ')}"
     end
 
@@ -127,6 +133,10 @@ module QUnited
 
     def helper_files_to_include
       files_array helper_files
+    end
+
+    def fixture_files_to_include
+      files_array fixture_files
     end
 
     def test_files_to_run
