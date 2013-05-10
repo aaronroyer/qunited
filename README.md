@@ -18,12 +18,15 @@ If you are using Bundler you can add QUnited to your Gemfile. With Rails add QUn
 
 ```ruby
 # In Gemfile
+
+gem 'coffee-script' # Optional, only needed if using CoffeeScript
 gem 'qunited'
 ```
 
 ```ruby
 # With Rails
 group :test, :development do
+  gem 'coffee-script' # Optional
   gem 'qunited'
 end
 ```
@@ -57,6 +60,10 @@ QUnited::RakeTask.new do |t|
 end
 ```
 These will be loaded after source files and before running tests. Separating helpers this way is merely for convenience and has the same effect as just including them last with your source files.
+
+### CoffeeScript
+
+CoffeeScript is also supported. If any included source or test files have the `.coffee` extension they will automatically be compiled and tests will be run with the resulting JavaScript. Compilation is done with the [coffee-script](https://github.com/josh/ruby-coffee-script) gem.
 
 ### Specifying a driver
 
