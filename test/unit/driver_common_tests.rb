@@ -57,8 +57,6 @@ module QUnited::DriverCommonTests
         File.join(FIXTURES_DIR, 'errors_project/test/javascripts/this_test_has_no_errors_in_it.js')])
 
     driver.run
-    stderr = captured_stderr
-    assert stderr.size > 10, 'Got some stderr output to describe the crash'
     @results = driver.results
     assert total_failed_tests.size > 0, 'Should fail if syntax error in test'
   end
