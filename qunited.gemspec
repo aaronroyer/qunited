@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "qunited"
   s.version     = QUnited::VERSION
   s.authors     = ["Aaron Royer"]
-  s.email       = ["aaronroyer@gmail.com"]
+  s.email       = ["aaronroyer@gmail.com", "thomsbg@gmail.com"]
   s.homepage    = "https://github.com/aaronroyer/qunited"
   s.summary     = %q{QUnit tests in your build}
   s.description = %q{QUnited runs headless QUnit tests as part of your normal build}
