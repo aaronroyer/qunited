@@ -49,7 +49,6 @@ module QUnited
         @tests_file = Tempfile.new(['tests_page', '.html'])
         @tests_file.write(tests_page_content)
         @tests_file.close
-        puts @tests_file.path
 
         send_to_formatter(:start)
 
